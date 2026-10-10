@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Download, Loader2, Play, RefreshCw, Sparkles } from "lucide-react";
+import { ArrowRight, Download, Loader2, Play, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
 import { AppHeader } from "@/components/Brand";
 import { IssueCard } from "@/components/review/IssueCard";
 import { Player, type PlayerHandle } from "@/components/review/Player";
@@ -39,6 +39,7 @@ export default function ReviewPage() {
   const [error, setError] = useState<string | null>(null);
   const [claude, setClaude] = useState<Record<string, LabelOpinion>>({});
   const [claudeBusy, setClaudeBusy] = useState<string | null>(null);
+  const [draftLabel, setDraftLabel] = useState<{ id: string; text: string } | null>(null);
   const player = useRef<PlayerHandle>(null);
   const lastT = useRef(0);
 
@@ -130,6 +131,24 @@ export default function ReviewPage() {
     }
   }
 
+  async function edit(body: { segment?: string; action: "edit" | "reject" | "add"; values?: Record<string, unknown> }) {
+    setBusy(true);
+    setError(null);
+    try {
+      const r = await postJSON<ClipDetail>(`/clips/${id}/decide`, { values: {}, ...body });
+      setD(r);
+      if (body.action === "reject") setSelected(null);
+      if (body.action === "add") {
+        const added = r.segments.find((x) => !segs.some((y) => y.id === x.id));
+        if (added) setSelected(added.id);
+      }
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function askClaude(sid: string) {
     setClaudeBusy(sid);
     setError(null);
@@ -198,6 +217,12 @@ export default function ReviewPage() {
           )}
           <Player ref={player} src={`${ENGINE_URL}/clips/${id}/video`} aspect={d.clip.width / d.clip.height} fps={d.clip.fps} track={track}
             segments={segs} status={rep?.status ?? {}} focus={focused} onTime={onTime} />
+          {rep && (
+            <div className="-mb-1 flex justify-end">
+              <button disabled={busy} onClick={() => edit({ action: "add", values: { start: Number(time.toFixed(2)), end: Number(Math.min(d.clip.duration, time + 2).toFixed(2)), narration: "new action" } })}
+                className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-ink-2 hover:bg-surface-2 hover:text-ink"><Plus className="h-3.5 w-3.5" /> Add a segment at {fmt(time)}</button>
+            </div>
+          )}
           {rep ? (
             <Timeline duration={d.clip.duration} segments={segs} status={rep.status} issues={issues} track={track} time={time}
               selected={selected} focus={focus} onSeek={(t) => player.current?.seek(t)} onSelect={setSelected} onFocus={goto} />
@@ -217,13 +242,35 @@ export default function ReviewPage() {
             </div>
           )}
           {sel && (
-            <section className="grid gap-3 rounded-xl border border-line bg-surface p-4 md:grid-cols-2">
+            <section className="grid gap-4 rounded-xl border border-line bg-surface p-4 xl:grid-cols-[minmax(0,300px)_minmax(0,1fr)]">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: STATUS[rep?.status[sel.id] ?? "pass"].color }} />
-                  <h2 className="font-semibold">“{sel.narration}”</h2>
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: STATUS[rep?.status[sel.id] ?? "pass"].color }} />
+                  <form className="flex min-w-0 flex-1 gap-1.5"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (draftLabel?.id === sel.id && draftLabel.text.trim()) edit({ segment: sel.id, action: "edit", values: { narration: draftLabel.text.trim() } });
+                    }}>
+                    <input aria-label="Label" value={draftLabel?.id === sel.id ? draftLabel.text : sel.narration}
+                      onChange={(e) => setDraftLabel({ id: sel.id, text: e.target.value })}
+                      className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-1.5 py-0.5 font-semibold hover:border-line focus:border-accent focus:bg-surface-2" />
+                    {draftLabel?.id === sel.id && draftLabel.text !== sel.narration && (
+                      <button disabled={busy} className="rounded-md bg-accent-fill px-2 text-xs font-semibold text-white">Save</button>
+                    )}
+                  </form>
                 </div>
-                <p className="num mt-0.5 text-xs text-muted">{fmt(sel.start)} – {fmt(sel.end)} · {(sel.end - sel.start).toFixed(1)} s · verb <b>{sel.verb}</b> · object <b>{sel.noun}</b></p>
+                <p className="num mt-0.5 text-xs text-muted">
+                  {fmt(sel.start)} – {fmt(sel.end)} · {(sel.end - sel.start).toFixed(1)} s · verb <b>{sel.verb}</b> · object <b>{sel.noun}</b>
+                  {sel.meta?.drafted_by === "ai" && <span className="ml-1 rounded bg-anomaly/30 px-1 text-[10px] text-ink">AI first pass</span>}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
+                  <button disabled={busy || time >= sel.end} onClick={() => edit({ segment: sel.id, action: "edit", values: { start: Number(time.toFixed(2)) } })}
+                    className="rounded-md border border-line px-2 py-1 hover:bg-surface-2 disabled:opacity-40">Start = {fmt(time)}</button>
+                  <button disabled={busy || time <= sel.start} onClick={() => edit({ segment: sel.id, action: "edit", values: { end: Number(time.toFixed(2)) } })}
+                    className="rounded-md border border-line px-2 py-1 hover:bg-surface-2 disabled:opacity-40">End = {fmt(time)}</button>
+                  <button disabled={busy} onClick={() => edit({ segment: sel.id, action: "reject" })}
+                    className="inline-flex items-center gap-1 rounded-md border border-line px-2 py-1 text-ink-2 hover:bg-surface-2 hover:text-collision"><Trash2 className="h-3 w-3" /> Drop</button>
+                </div>
                 <div className="mt-3 space-y-2">
                   {groqOpinion(sel.id) && <Opinion o={groqOpinion(sel.id)!} title="AI reviewer (automatic)" />}
                   {claude[sel.id] && <Opinion o={claude[sel.id]} title="Claude (second opinion)" />}

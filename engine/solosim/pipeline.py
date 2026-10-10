@@ -9,7 +9,7 @@ from dataclasses import asdict
 
 import numpy as np
 
-from . import checks, signals, vlm
+from . import checks, draft, signals, vlm
 from .clip_io import Clip
 
 
@@ -18,13 +18,17 @@ def analyze(clip: Clip, progress=None, labels: bool = True) -> dict:
     t0 = time.time()
     say("Measuring every frame: hands, faces, blur, light, motion", 0.02)
     sig = signals.load(clip, progress=lambda m, f: say(m, 0.02 + 0.5 * f))
+    if not clip.segments:
+        say("No annotations: AI first pass from hand activity", 0.53)
+        draft.draft(clip, sig, progress=lambda m, f: say(m, 0.53 + 0.3 * f))
     say("Checking timing and capture", 0.55)
     issues = checks.run(clip, sig)
     label_results = {}
-    if labels:
+    human = {s.id for s in clip.segments if (s.meta or {}).get("drafted_by") != "ai"}  # AI-named labels: no second AI opinion
+    if labels and human:
         say(f"Second opinion on every label ({vlm.backend()})", 0.6)
         try:
-            label_results = vlm.check(clip, progress=lambda m, f: say(m, 0.6 + 0.35 * f))
+            label_results = vlm.check(clip, only=human, progress=lambda m, f: say(m, 0.6 + 0.35 * f))
         except Exception as e:  # noqa: BLE001 - the gate still reports timing/capture without labels
             say(f"label check unavailable: {e!r}"[:200], 0.95)
         issues += vlm.issues(clip, label_results)

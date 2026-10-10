@@ -1,0 +1,289 @@
+{
+ "id": "P01_04-P01_04_10-173700",
+ "clip": "P01_04",
+ "segment": "P01_04_10",
+ "narration": "fold tablecloth",
+ "prompt": "Strict first-person view from a head-mounted camera, the camera wearer's own hands in the lower half of the frame. In a home kitchen, the hands fold tablecloth: slowly and clearly, the object staying in view. The camera holds steady; the room, furniture and lighting stay exactly as in the first frame. Photorealistic, two human hands, natural skin, no extra people.",
+ "start": 30.75,
+ "end": 35.04,
+ "chunks": 12,
+ "real_frames": 12,
+ "metrics": [
+  {
+   "k": 0,
+   "scene": 0.943,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.09551048278808594,
+     0.6710170924878723,
+     0.3252650260925293,
+     0.9999039302233754
+    ],
+    [
+     0.6428146362304688,
+     0.5040421468686541,
+     0.9033872604370117,
+     0.7817624088659183
+    ]
+   ]
+  },
+  {
+   "k": 1,
+   "scene": 0.858,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.14759016036987305,
+     0.5281975811569269,
+     0.34465484619140624,
+     0.8902387928876636
+    ],
+    [
+     0.6213096618652344,
+     0.40508515395842737,
+     0.8759944915771485,
+     0.74195597404177
+    ]
+   ]
+  },
+  {
+   "k": 2,
+   "scene": 0.866,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.25489063262939454,
+     0.5755074291022676,
+     0.40118478139241537,
+     0.8445901698584161
+    ],
+    [
+     0.6595090866088867,
+     0.5443944276885435,
+     0.8468521118164063,
+     0.8444456245064305
+    ]
+   ]
+  },
+  {
+   "k": 3,
+   "scene": 0.859,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.32514305114746095,
+     0.6130177191448556,
+     0.46036672592163086,
+     0.8612645008073386
+    ],
+    [
+     0.6082287470499674,
+     0.592648943408732,
+     0.7493414560953776,
+     0.8201669080162737
+    ]
+   ]
+  },
+  {
+   "k": 4,
+   "scene": 0.838,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.26686868667602537,
+     0.637341661143389,
+     0.3719933827718099,
+     0.8397310993731667
+    ],
+    [
+     0.6758018493652344,
+     0.5723568472190884,
+     0.8155435562133789,
+     0.8165116292905291
+    ]
+   ]
+  },
+  {
+   "k": 5,
+   "scene": 0.828,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.7455682754516602,
+     0.6634460889905799,
+     0.9987260818481445,
+     0.9996749933015568
+    ],
+    [
+     0.13428945541381837,
+     0.6693377443168999,
+     0.32458842595418297,
+     0.9983218637184116
+    ]
+   ]
+  },
+  {
+   "k": 6,
+   "scene": 0.694,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.8432687759399414,
+     0.246403112308213,
+     0.9998445510864258,
+     0.6809245085458032
+    ],
+    [
+     0.0630732536315918,
+     0.28469182093651285,
+     0.26574689547220864,
+     0.6748575148599673
+    ]
+   ]
+  },
+  {
+   "k": 7,
+   "scene": 0.708,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.17432103157043458,
+     0.40355288508997067,
+     0.31272958119710287,
+     0.6626342332750451
+    ],
+    [
+     0.7518368403116862,
+     0.33131323308290556,
+     0.909628168741862,
+     0.5850430154628272
+    ]
+   ]
+  },
+  {
+   "k": 8,
+   "scene": 0.816,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.23824755350748697,
+     0.523050907286496,
+     0.39504194259643555,
+     0.7877632444085627
+    ],
+    [
+     0.6446018218994141,
+     0.46985149727831677,
+     0.8012579600016276,
+     0.7537790016146774
+    ]
+   ]
+  },
+  {
+   "k": 9,
+   "scene": 0.784,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.22858128547668458,
+     0.5953060108832073,
+     0.37764673233032225,
+     0.7911207839470047
+    ],
+    [
+     0.6482241312662761,
+     0.5180946653070002,
+     0.8115404764811198,
+     0.7385441749104524
+    ]
+   ]
+  },
+  {
+   "k": 10,
+   "scene": 0.789,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.21532683372497557,
+     0.5631542550097304,
+     0.35325196584065754,
+     0.8290460359318592
+    ],
+    [
+     0.6753512064615885,
+     0.4679552759934849,
+     0.8256931940714518,
+     0.7792297803968299
+    ]
+   ]
+  },
+  {
+   "k": 11,
+   "scene": 0.783,
+   "hands": 1,
+   "hand_boxes": [
+    [
+     0.719510841369629,
+     0.5581471136761056,
+     0.8878246307373047,
+     0.7651119851893897
+    ]
+   ]
+  }
+ ],
+ "judge": {
+  "renders_action": false,
+  "verdict": "fails",
+  "failures": [
+   {
+    "frame": 2,
+    "kind": "object morphed",
+    "what": "Black cloth turns into black-and-white striped towel with a white band, not the real plain black cloth.",
+    "k": 2
+   },
+   {
+    "frame": 4,
+    "kind": "object morphed",
+    "what": "Cloth is now plain white and large, changing color and material mid-action.",
+    "k": 6
+   },
+   {
+    "frame": 4,
+    "kind": "scene changed",
+    "what": "Kitchen background changes: sink, pot, and counter layout differ from the real scene.",
+    "k": 6
+   },
+   {
+    "frame": 5,
+    "kind": "object morphed",
+    "what": "Cloth lies flat as a white sheet with a fold, not a folded black tablecloth.",
+    "k": 8
+   },
+   {
+    "frame": 6,
+    "kind": "wrong action",
+    "what": "Hands grip a white cloth already folded, not the black tablecloth being folded in real footage.",
+    "k": 11
+   },
+   {
+    "frame": 5,
+    "kind": "hands merged",
+    "what": "Hand placement is ambiguous; fingers and wrists blend into the cloth edge.",
+    "k": 8
+   }
+  ],
+  "summary": "Render starts plausibly but morphs the black tablecloth into white striped cloth, changes the scene, and drifts from the annotated fold action."
+ },
+ "drift_from": 6,
+ "usage": {
+  "backend": "reactor",
+  "model": "reactor/lingbot-world-2",
+  "seconds": 11.0,
+  "usd": 0.077,
+  "cap_seconds": 30,
+  "frames": 220,
+  "chunks": 12
+ },
+ "at": "2026-10-10 17:37:21"
+}

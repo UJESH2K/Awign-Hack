@@ -1,0 +1,289 @@
+{
+ "id": "P01_08-P01_08_27-173618",
+ "clip": "P01_08",
+ "segment": "P01_08_27",
+ "narration": "pour water into glass",
+ "prompt": "Strict first-person view from a head-mounted camera, the camera wearer's own hands in the lower half of the frame. In a home kitchen, the hands pour water into glass: slowly and clearly, the object staying in view. The camera holds steady; the room, furniture and lighting stay exactly as in the first frame. Photorealistic, two human hands, natural skin, no extra people.",
+ "start": 84.71,
+ "end": 88.48,
+ "chunks": 12,
+ "real_frames": 12,
+ "metrics": [
+  {
+   "k": 0,
+   "scene": 0.948,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.4189356803894043,
+     0.4967084533471063,
+     0.5995630900065104,
+     0.9257033585641359
+    ],
+    [
+     0.7495999018351237,
+     0.45835735995846966,
+     0.960128657023112,
+     0.8598045046148748
+    ]
+   ]
+  },
+  {
+   "k": 1,
+   "scene": 0.906,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.41583007176717124,
+     0.4698002123230201,
+     0.6032918294270834,
+     0.8754624459717678
+    ],
+    [
+     0.751188596089681,
+     0.4174061028105257,
+     0.94593505859375,
+     0.8267066487336417
+    ]
+   ]
+  },
+  {
+   "k": 2,
+   "scene": 0.894,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.3976560592651367,
+     0.42668333638876355,
+     0.6187618891398112,
+     0.8058284938550598
+    ],
+    [
+     0.7570379892985026,
+     0.33287417415247067,
+     0.9511383692423503,
+     0.7654839801444043
+    ]
+   ]
+  },
+  {
+   "k": 3,
+   "scene": 0.89,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.7448811213175456,
+     0.35462835979805957,
+     0.9713720957438151,
+     0.7771890137600124
+    ],
+    [
+     0.36459150314331057,
+     0.40667518037320904,
+     0.6107868830362956,
+     0.7456826991552911
+    ]
+   ]
+  },
+  {
+   "k": 4,
+   "scene": 0.865,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.7395363489786784,
+     0.4159427463793152,
+     0.9805132548014323,
+     0.8123226234628835
+    ],
+    [
+     0.34644606908162434,
+     0.365839934090845,
+     0.6117437362670899,
+     0.6954765457538922
+    ]
+   ]
+  },
+  {
+   "k": 5,
+   "scene": 0.835,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.7168375651041666,
+     0.4463896493188741,
+     0.9653565088907877,
+     0.871656231931831
+    ],
+    [
+     0.33490581512451173,
+     0.29968845629089574,
+     0.6116945266723632,
+     0.6353459547573048
+    ]
+   ]
+  },
+  {
+   "k": 6,
+   "scene": 0.876,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.30201791127522787,
+     0.3357360233899058,
+     0.5662440617879232,
+     0.7025868109417306
+    ],
+    [
+     0.6763752619425456,
+     0.47839658441096006,
+     0.9796915690104167,
+     0.9566067582003046
+    ]
+   ]
+  },
+  {
+   "k": 7,
+   "scene": 0.861,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.25885586738586425,
+     0.43805355801909407,
+     0.5117877324422201,
+     0.7766703251036496
+    ],
+    [
+     0.7014577865600586,
+     0.48921032847049867,
+     0.9906213760375977,
+     0.915342420447174
+    ]
+   ]
+  },
+  {
+   "k": 8,
+   "scene": 0.864,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.713593864440918,
+     0.4135126327349391,
+     0.9888280868530274,
+     0.8304955107210346
+    ],
+    [
+     0.2438035011291504,
+     0.39695431265159636,
+     0.5116081237792969,
+     0.7680781946285536
+    ]
+   ]
+  },
+  {
+   "k": 9,
+   "scene": 0.868,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.7151450475056966,
+     0.3562679635058241,
+     0.9913070678710938,
+     0.8053782218630133
+    ],
+    [
+     0.23268605868021647,
+     0.37080022488260095,
+     0.5690473556518555,
+     0.7746248761669393
+    ]
+   ]
+  },
+  {
+   "k": 10,
+   "scene": 0.88,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.7572879791259766,
+     0.391659623018671,
+     1.0,
+     0.8218155182655968
+    ],
+    [
+     0.22581706047058106,
+     0.3863271720142571,
+     0.46219806671142577,
+     0.7721374732062274
+    ]
+   ]
+  },
+  {
+   "k": 11,
+   "scene": 0.883,
+   "hands": 2,
+   "hand_boxes": [
+    [
+     0.7698233922322592,
+     0.4419024911598178,
+     0.9999343872070312,
+     0.919102086917588
+    ],
+    [
+     0.1946575164794922,
+     0.4654993821567577,
+     0.4022168477376302,
+     0.8873096011605934
+    ]
+   ]
+  }
+ ],
+ "judge": {
+  "renders_action": false,
+  "verdict": "fails",
+  "failures": [
+   {
+    "frame": 2,
+    "kind": "hands merged",
+    "what": "Left hand fuses with bottle; hand anatomy becomes ambiguous near the glass.",
+    "k": 2
+   },
+   {
+    "frame": 3,
+    "kind": "extra hand",
+    "what": "Arm and hand from the left enter frame; hand count differs from real footage.",
+    "k": 4
+   },
+   {
+    "frame": 4,
+    "kind": "object morphed",
+    "what": "Glass shape warps; a stray circular outline appears around the held glass.",
+    "k": 6
+   },
+   {
+    "frame": 5,
+    "kind": "object morphed",
+    "what": "Glass gains a ghosted circular outline and distorted rim; transparency inconsistent.",
+    "k": 8
+   },
+   {
+    "frame": 6,
+    "kind": "wrong action",
+    "what": "Glass is lifted and tilted to drink-like pose; no water pouring from bottle occurs.",
+    "k": 11
+   }
+  ],
+  "summary": "Render drifts from the real pour: hands morph, extra arms appear, glass warps, and the pour never shows water transferring into the glass."
+ },
+ "drift_from": null,
+ "usage": {
+  "backend": "reactor",
+  "model": "reactor/lingbot-world-2",
+  "seconds": 10.8,
+  "usd": 0.075,
+  "cap_seconds": 30,
+  "frames": 244,
+  "chunks": 12
+ },
+ "at": "2026-10-10 17:36:47"
+}

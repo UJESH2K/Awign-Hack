@@ -45,7 +45,7 @@ export function RenderView({ r }: { r: RenderResult }) {
       <div className="flex flex-wrap items-center gap-2">
         <v.icon className={`h-5 w-5 ${v.color}`} aria-hidden />
         <span className={`font-semibold ${v.color}`}>{v.label}</span>
-        <span className="text-sm text-ink-2">· {r.judge.summary}</span>
+        <span className="w-full text-sm text-ink-2">{r.judge.summary}</span>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
         <figure>

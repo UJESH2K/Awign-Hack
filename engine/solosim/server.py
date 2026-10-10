@@ -144,11 +144,11 @@ async def frame(cid: str, t: float = 0.0, w: int = 480):
 
 # ------------------------------------------------------------------ upload
 @app.post("/clips/upload")
-async def upload(video: UploadFile = File(...), annotations: UploadFile = File(...), title: str = Form(""), task: str = Form("")):
+async def upload(video: UploadFile = File(...), annotations: UploadFile | None = File(None), title: str = Form(""), task: str = Form("")):
     import re
     import tempfile
 
-    raw_ann = (await annotations.read()).decode("utf-8", errors="replace")
+    raw_ann = (await annotations.read()).decode("utf-8", errors="replace") if annotations is not None else ""
     cid = re.sub(r"[^A-Za-z0-9_-]+", "-", (title or video.filename or "clip").rsplit(".", 1)[0])[:40].strip("-") or "clip"
     cid = f"{cid}-{time.strftime('%H%M%S')}"
     d = CLIPS / cid
@@ -156,13 +156,14 @@ async def upload(video: UploadFile = File(...), annotations: UploadFile = File(.
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4", dir=d) as f:
         f.write(await video.read())
         src = f.name
-    segs = _parse_annotations(raw_ann)
-    if not segs:
+    segs = _parse_annotations(raw_ann) if raw_ann.strip() else []  # none: the AI first pass drafts them
+    if raw_ann.strip() and not segs:
         raise HTTPException(400, "no segments found: upload EPIC-style CSV or JSON [{start, end, label}]")
     await asyncio.to_thread(_to_browser_mp4, src, d / "video.mp4")
     (d / "annotations.json").write_text(json.dumps({
         "title": title or video.filename, "task": task or "first-person task",
-        "source": {"dataset": "upload", "filename": video.filename, "annotation_file": annotations.filename},
+        "source": {"dataset": "upload", "filename": video.filename,
+                   "annotation_file": annotations.filename if annotations is not None else "AI first pass"},
         "segments": segs}, indent=1), encoding="utf-8")
     return Clip(cid).summary()
 
@@ -261,13 +262,17 @@ async def decide(cid: str, d: Decision):
                     g.verb, g.noun = g.narration.split()[0], " ".join(g.narration.split()[1:])
     elif d.action == "reject" and d.segment:
         segs = [g for g in segs if g.id != d.segment]
-    if d.action in ("apply", "edit", "reject"):
+    elif d.action == "add":
+        label = str(d.values.get("narration") or "unnamed action")
+        segs.append(Segment(id=f"qa-{int(time.time() * 1000) % 10_000_000}", start=float(d.values["start"]), end=float(d.values["end"]),
+                            verb=label.split()[0], noun=" ".join(label.split()[1:]), narration=label, meta={"added_by": "qa"}))
+    if d.action in ("apply", "edit", "reject", "add"):
         c.save_segments(sorted(segs, key=lambda s: s.start))
     rv["decisions"].append({"at": time.strftime("%Y-%m-%d %H:%M:%S"), "segment": d.segment or (issue or {}).get("segment"),
                             "issue": d.issue, "kind": (issue or {}).get("kind"), "action": d.action, "values": d.values, "note": d.note})
     (c.dir / "review.json").write_text(json.dumps(rv, indent=1), encoding="utf-8")
     # Re-check the edited timeline right away (cheap: signals are cached; label opinions stay cached).
-    if d.action in ("apply", "edit", "reject") and (c.dir / "signals.npz").exists():
+    if d.action in ("apply", "edit", "reject", "add") and (c.dir / "signals.npz").exists():
         await asyncio.to_thread(_recheck, c)
     return await report(cid)
 
@@ -328,7 +333,7 @@ async def export(cid: str):
 @app.get("/bench")
 async def bench():
     root = DATA / "solosim"
-    return {"timing": _read(root / "bench.json"), "labels": {k: _read(root / f"label_bench_{k}.json") for k in ("groq", "qwen", "claude")}}
+    return {"timing": _read(root / "bench.json"), "labels": {k: _read(root / f"label_bench_{k}.json") for k in ("haiku", "groq", "qwen", "claude")}}
 
 
 @app.get("/spend")

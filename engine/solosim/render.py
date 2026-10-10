@@ -36,7 +36,7 @@ _runs: dict[str, dict] = {}
 
 def prompt_for(narration: str, task: str) -> str:
     return ("Strict first-person view from a head-mounted camera, the camera wearer's own hands in the lower half of the "
-            f"frame. In a {task or 'home kitchen'}, the hands {narration}, slowly and clearly, the object staying in view. "
+            f"frame. In a {task or 'home kitchen'}, the hands {narration}: slowly and clearly, the object staying in view. "
             "The camera holds steady; the room, furniture and lighting stay exactly as in the first frame. Photorealistic, "
             "two human hands, natural skin, no extra people.")
 
@@ -64,13 +64,61 @@ JUDGE = {
 }
 
 
+JUDGE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "renders_action": {"type": "boolean"},
+        "verdict": {"type": "string", "enum": ["works", "partial", "fails"]},
+        "failures": {"type": "array", "items": {"type": "object", "properties": {
+            "frame": {"type": "integer"},
+            "kind": {"type": "string", "enum": ["hands missing", "hands merged", "extra hand", "object vanished", "object morphed",
+                                                 "wrong action", "scene changed", "camera drift"]},
+            "what": {"type": "string"}}, "required": ["frame", "kind", "what"], "additionalProperties": False}},
+        "summary": {"type": "string"},
+    },
+    "required": ["renders_action", "verdict", "failures", "summary"],
+    "additionalProperties": False,
+}
+
+
+def _judge_claude(real, render, narration) -> dict:
+    import anthropic
+
+    from . import vlm
+
+    if not vlm.claude_spend()["available"]:
+        raise vlm.SpendCap("Claude spend cap reached")
+    content = [{"type": "text", "text": f"Image 1: six frames of REAL first-person footage of the annotated action \"{narration}\"."},
+               {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": _sheet(real, cell=320)}},
+               {"type": "text", "text": "Image 2: six frames (numbered 1-6) of a WORLD-MODEL RENDER that started from the first real frame "
+                                        "and was asked to show the same action."},
+               {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": _sheet(render, cell=320)}},
+               {"type": "text", "text": "Compare them. Where does the render fail to reproduce the annotation as a usable robot-training "
+                                        "scenario? Be specific about the hands and the object; frame numbers refer to image 2. "
+                                        "summary: max 30 words; each failure 'what': max 15 words."}]
+    r = anthropic.Anthropic().messages.create(
+        model=vlm.BULK_MODEL, max_tokens=2000,
+        system="You audit world-model renders used as robot-training scenarios. Judge only from the images.",
+        output_config={"effort": "low", "format": {"type": "json_schema", "schema": JUDGE_SCHEMA}},
+        messages=[{"role": "user", "content": content}])
+    vlm._charge(r.usage, f"render judge: {narration}", vlm.BULK_MODEL)
+    if r.stop_reason == "refusal":
+        return {"verdict": "unknown", "failures": [], "summary": "judge declined", "renders_action": False}
+    return json.loads(next(b.text for b in r.content if b.type == "text"))
+
+
 def judge(real: list[np.ndarray], render: list[np.ndarray], narration: str) -> dict:
-    """Free vision judge (Groq): real footage vs render, failure points by frame."""
+    """Vision judge: real footage vs render, failure points by frame (Claude Haiku, else Groq)."""
     import os
     import urllib.request
 
     from . import vlm  # loads .env.local
 
+    if vlm.backend() == "haiku":
+        try:
+            return _judge_claude(real, render, narration)
+        except Exception as e:  # noqa: BLE001 - fall through to Groq
+            print(f"claude judge failed: {e!r}"[:200])
     if not os.environ.get("GROQ_API_KEY"):
         return {"verdict": "unknown", "failures": [], "summary": "no judge configured", "renders_action": False}
     keys = "; ".join(f"{k}: {v}" for k, v in JUDGE.items())
@@ -136,7 +184,8 @@ async def _render(rid: str, clip: Clip, seg, seconds: int):
     real = [clip.frame_at(float(t)) for t in np.linspace(seg.start, seg.end, 12)]
     for i, im in enumerate(real):
         cv2.imwrite(str(d / "real" / f"{i:03d}.jpg"), cv2.cvtColor(im, cv2.COLOR_RGB2BGR), [cv2.IMWRITE_JPEG_QUALITY, 85])
-    prompt = prompt_for(seg.narration, clip.task.split(",")[0] if clip.task else "home kitchen")
+    place = "home kitchen" if "kitchen" in (clip.task or "").lower() else (clip.task or "workplace").split(",")[0].strip()
+    prompt = prompt_for(seg.narration, place)
     world = ReactorWorld("drone", log=lambda m: st.update(stage=m))
     frames = []
     try:

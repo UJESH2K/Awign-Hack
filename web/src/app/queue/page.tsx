@@ -48,12 +48,12 @@ export default function QueuePage() {
     e.preventDefault();
     const v = videoRef.current?.files?.[0];
     const a = annRef.current?.files?.[0];
-    if (!v || !a) return setError("Pick a video and its annotation file.");
+    if (!v) return setError("Pick a first-person video.");
     setUploading(true);
     setError(null);
     const fd = new FormData();
     fd.append("video", v);
-    fd.append("annotations", a);
+    if (a) fd.append("annotations", a);
     fd.append("title", title || v.name);
     try {
       const r = await fetch("/engine/clips/upload", { method: "POST", body: fd });
@@ -162,7 +162,7 @@ export default function QueuePage() {
 
           <form onSubmit={upload} className="h-fit rounded-xl border border-line bg-surface p-4">
             <h2 className="flex items-center gap-2 font-semibold"><Upload className="h-4 w-4 text-accent" /> Add a clip</h2>
-            <p className="mt-1 text-xs text-ink-2">A first-person video and its annotations: EPIC-KITCHENS CSV, or JSON rows of {"{start, end, label}"}.</p>
+            <p className="mt-1 text-xs text-ink-2">A first-person video and its annotations: EPIC-KITCHENS CSV, or JSON rows of {"{start, end, label}"}. No annotations? Leave it empty and the AI drafts a first pass for you to check.</p>
             <label className="mt-3 block text-xs text-muted">Title
               <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Warehouse picking, worker 12"
                 className="mt-1 w-full rounded-lg border border-line bg-surface-2 px-2.5 py-1.5 text-sm text-ink" />
@@ -170,7 +170,7 @@ export default function QueuePage() {
             <label className="mt-3 block text-xs text-muted">Video
               <input ref={videoRef} type="file" accept="video/*" className="mt-1 block w-full text-xs file:mr-2 file:rounded-md file:border-0 file:bg-surface-2 file:px-2 file:py-1 file:text-ink" />
             </label>
-            <label className="mt-3 block text-xs text-muted">Annotations
+            <label className="mt-3 block text-xs text-muted">Annotations (optional)
               <input ref={annRef} type="file" accept=".csv,.json" className="mt-1 block w-full text-xs file:mr-2 file:rounded-md file:border-0 file:bg-surface-2 file:px-2 file:py-1 file:text-ink" />
             </label>
             <button disabled={uploading} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent-fill px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">

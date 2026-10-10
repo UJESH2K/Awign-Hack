@@ -1,12 +1,13 @@
 """Label second opinion: does the footage show what the annotation says?
 
-Three backends:
-    groq     Qwen 3.8 27B on Groq (vision, ~1 s, free tier): the automatic check on every segment.
-             Sees five time-stamped frames, the label and its neighbours; returns a verdict, what it
-             actually sees, and the frame that proves it.
-    claude   Claude Opus 5.5: the same question, only when a tester asks for a deeper second opinion
-             on one segment. Every call is priced from its token usage and logged; calls stop at a
-             hard cap (SOLOSIM_CLAUDE_CAP_USD).
+Backends:
+    haiku    Claude Haiku 5.5: the automatic check on every segment (~$0.0003 each). Sees a contact
+             sheet of six time-stamped frames, the label and its neighbours; returns a verdict, what
+             it actually sees, and the frame that proves it.
+    claude   Claude Opus 5.5: the same question, only when a tester asks for a deeper second opinion.
+             Every Claude call is priced from its token usage and logged; calls stop at a hard cap
+             (SOLOSIM_CLAUDE_CAP_USD).
+    groq     Qwen 3.8 27B on Groq (free tier, ~95 checks/day): automatic check without a Claude key.
     qwen     local Qwen2.5-VL via Ollama (offline fallback): describes the frames WITHOUT seeing the
              label (small models agree with whatever they are told), compared by text embedding.
 
@@ -28,11 +29,17 @@ import numpy as np
 from .checks import Issue
 from .clip_io import DATA, ENGINE, Clip, Segment
 
-MODEL = "claude-opus-5-5"
-PRICE = (4.0, 20.0)  # USD per million input / output tokens
+MODEL = "claude-opus-5-5"  # second opinion, on click
+BULK_MODEL = "claude-haiku-5-5"  # automatic check
+PRICES = {"claude-opus-5-5": (4.0, 20.0), "claude-haiku-5-5": (0.10, 0.50)}  # USD per million input / output tokens
 GROQ_MODEL = "qwen/qwen3.8-27b"
 LEDGER = DATA / "solosim" / "claude_spend.json"
 FRAMES = 5
+# Calibrated on 64 real + 64 planted-wrong labels (scripts/label_bench.py, Haiku): a confident
+# "wrong" (>= 0.7) catches 53% of planted errors and flags 3% of real labels; doubtful (0.6-0.7)
+# raises that to 72% / 20%, so it is a lower-priority "check", never a "fix".
+LABEL_FIX_CONF = 0.7
+LABEL_CHECK_CONF = 0.6
 _ledger_lock = threading.Lock()
 
 SCHEMA = {
@@ -70,7 +77,9 @@ _load_env()
 
 
 def backend() -> str:
-    """The automatic checker. Claude is never automatic: it is asked for explicitly."""
+    """The automatic checker: Haiku with a Claude key (Opus only on click), else Groq, else local."""
+    if os.environ.get("ANTHROPIC_API_KEY") and claude_spend()["spent_usd"] < claude_spend()["cap_usd"]:
+        return "haiku"
     return "groq" if os.environ.get("GROQ_API_KEY") else "qwen"
 
 
@@ -86,11 +95,12 @@ def claude_spend() -> dict:
             "available": bool(os.environ.get("ANTHROPIC_API_KEY")) and spent < cap}
 
 
-def _charge(usage, what: str) -> float:
-    usd = usage.input_tokens * PRICE[0] / 1e6 + usage.output_tokens * PRICE[1] / 1e6
+def _charge(usage, what: str, model: str = MODEL) -> float:
+    pin, pout = PRICES[model]
+    usd = usage.input_tokens * pin / 1e6 + usage.output_tokens * pout / 1e6
     with _ledger_lock:
         led = json.loads(LEDGER.read_text(encoding="utf-8")) if LEDGER.exists() else {"calls": []}
-        led["calls"].append({"at": time.strftime("%Y-%m-%d %H:%M:%S"), "what": what, "in": usage.input_tokens,
+        led["calls"].append({"at": time.strftime("%Y-%m-%d %H:%M:%S"), "what": what, "model": model, "in": usage.input_tokens,
                              "out": usage.output_tokens, "usd": round(usd, 5)})
         LEDGER.parent.mkdir(parents=True, exist_ok=True)
         LEDGER.write_text(json.dumps(led, indent=1), encoding="utf-8")
@@ -169,28 +179,35 @@ def _groq(clip, g, prev, nxt):
     return _finish(json.loads(r["choices"][0]["message"]["content"]), frames, g, "groq")
 
 
-def _claude(clip, g, prev, nxt):
+def _claude(clip, g, prev, nxt, model: str = MODEL):
     import anthropic
 
     if not claude_spend()["available"]:
-        raise SpendCap("Claude second opinions are off: no key, or the spend cap is reached")
-    frames = _frames(clip, g)
-    content = []
-    for i, (t, b64) in enumerate(frames):
-        content.append({"type": "text", "text": f"Frame {i + 1} at {t:.2f} s"})
-        content.append({"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": b64}})
-    content.append({"type": "text", "text": _question(g, prev, nxt)})
+        raise SpendCap("Claude checks are off: no key, or the spend cap is reached")
+    ts, sheet = contact_sheet(clip, g, cell=320)
+    frames = [(t, None) for t in ts]
+    content = [{"type": "text", "text": f"{len(ts)} frames of the segment in time order, left to right then top to bottom; "
+                                        "each is stamped with its number and time."},
+               {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": sheet}},
+               {"type": "text", "text": _question(g, prev, nxt)}]
+    which = "claude" if model == MODEL else "haiku"
+    kw = {}
+    if model == MODEL:  # Opus: server-side refusal fallback (Haiku has none; a refusal reads as 'unsure')
+        kw = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
     r = anthropic.Anthropic().beta.messages.create(
-        model=MODEL, max_tokens=2000, system=SYSTEM,
-        betas=["server-side-fallback-2026-07-01"], fallbacks="default",
+        model=model, max_tokens=2000, system=SYSTEM,
         output_config={"effort": "low", "format": {"type": "json_schema", "schema": SCHEMA}},
-        messages=[{"role": "user", "content": content}],
+        messages=[{"role": "user", "content": content}], **kw,
     )
-    _charge(r.usage, f"{clip.id}/{g.id}")
+    _charge(r.usage, f"{clip.id}/{g.id}", model)
     if r.stop_reason == "refusal":
         return _finish({"verdict": "unsure", "observed_action": "", "evidence_frame": 1, "explanation": "model declined",
-                        "confidence": 0.0}, frames, g, "claude")
-    return _finish(json.loads(next(b.text for b in r.content if b.type == "text")), frames, g, "claude")
+                        "confidence": 0.0}, frames, g, which)
+    return _finish(json.loads(next(b.text for b in r.content if b.type == "text")), frames, g, which)
+
+
+def _haiku(clip, g, prev, nxt):
+    return _claude(clip, g, prev, nxt, model=BULK_MODEL)
 
 
 def _ollama(path, body, timeout=240):
@@ -251,9 +268,9 @@ def check(clip: Clip, segments: list[Segment] | None = None, only: set | None = 
         nxt = segs[n + 1].narration if n + 1 < len(segs) else "(end of video)"
         jobs.append((g, prev, nxt, _key(g, prev, nxt, which)))
     todo = [j for j in jobs if j[3] not in cache]
-    if todo and which in ("claude", "groq"):
-        fn = _claude if which == "claude" else _groq
-        with cf.ThreadPoolExecutor(2) as ex:
+    if todo and which in ("claude", "groq", "haiku"):
+        fn = {"claude": _claude, "groq": _groq, "haiku": _haiku}[which]
+        with cf.ThreadPoolExecutor(6 if which == "haiku" else 2) as ex:
             futs = {ex.submit(fn, clip, g, p, x): k for g, p, x, k in todo}
             for i, f in enumerate(cf.as_completed(futs)):
                 try:
@@ -286,11 +303,15 @@ def issues(clip: Clip, results: dict, segments: list[Segment] | None = None, sta
         if g is None:
             continue
         v = r.get("verdict")
-        who = {"claude": "Claude", "groq": "The AI reviewer"}.get(r.get("backend"), "The local model")
-        if v in ("wrong verb", "wrong object", "wrong action"):
+        who = {"claude": "Claude Opus", "groq": "The AI reviewer", "haiku": "The AI reviewer"}.get(r.get("backend"), "The local model")
+        conf = float(r.get("confidence") or 0)
+        if v in ("wrong verb", "wrong object", "wrong action") and conf >= LABEL_CHECK_CONF:
             seen = (r.get("observed_action") or "").strip()
-            out.append(Issue(id=f"i{start + len(out)}", segment=sid, kind="label mismatch", group="label", severity="fix",
-                             t=float(r.get("t", g.mid)), title=f"{v.capitalize()}: the footage shows '{seen}'",
+            sure = conf >= LABEL_FIX_CONF or r.get("backend") == "claude"
+            out.append(Issue(id=f"i{start + len(out)}", segment=sid, kind="label mismatch" if sure else "label doubtful", group="label",
+                             severity="fix" if sure else "check",
+                             t=float(r.get("t", g.mid)), title=f"{v.capitalize()}: the footage shows '{seen}'" if sure
+                             else f"Doubtful label: the footage may show '{seen}'",
                              detail=r.get("explanation", ""), nudge=f"{who} sees '{seen}', not '{g.narration}'. Relabel?",
                              suggestion={"field": "narration", "value": seen} if seen else None,
                              evidence={"verdict": v, "confidence": r.get("confidence"), "backend": r.get("backend")}))

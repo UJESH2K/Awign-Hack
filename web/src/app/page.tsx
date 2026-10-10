@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 type Bench = {
   timing: { summary: { recall: number; planted: number; false_flag_rate: number; by_kind: Record<string, { recall: number }> }; review_load: { share: number } } | null;
-  labels: Record<string, { recall: number; false_flag_rate: number; segments: number } | null>;
+  labels: Record<string, { recall: number; false_flag_rate: number; segments: number; tiers?: { fix: { recall: number; false_flag_rate: number } } } | null>;
 };
 
 async function bench(): Promise<Bench | null> {
@@ -39,7 +39,7 @@ const CHECKS = [
 export default async function Landing() {
   const b = await bench();
   const t = b?.timing;
-  const lab = b?.labels?.groq ?? null;
+  const lab = b?.labels?.haiku ?? b?.labels?.groq ?? null;
   return (
     <div className="min-h-screen overflow-x-clip">
       <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur">
@@ -75,6 +75,15 @@ export default async function Landing() {
               See the evidence
             </Link>
           </div>
+
+          <figure className="mt-12 overflow-hidden rounded-2xl border border-line bg-[#0b0c0e] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.45)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/shots/review.jpg" alt="The reviewer workspace: first-person footage with the detected hands boxed, the segment timeline coloured by status, and a nudge to move the end of 'put cereal bar into box' to 0:10.4 with a one-click fix."
+              className="w-full" width={1920} height={1200} />
+          </figure>
+          <p className="mt-3 text-center text-sm text-muted">
+            The tester&apos;s view: the footage starts at the wrong moment, the hands are boxed, and the fix is one click.
+          </p>
           {t && (
             <dl className="mt-12 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-3">
               <div className="bg-surface p-5">
@@ -88,9 +97,9 @@ export default async function Landing() {
                 <dd className="text-xs text-muted">testers are not buried in noise</dd>
               </div>
               <div className="bg-surface p-5">
-                <dt className="text-sm text-ink-2">{lab ? "wrong labels flagged by the AI reviewer" : "mistyped end times caught"}</dt>
-                <dd className="num mt-1 text-4xl font-semibold tracking-tight">{Math.round((lab ? lab.recall : t.summary.by_kind.truncated?.recall ?? 0) * 100)}%</dd>
-                <dd className="text-xs text-muted">{lab ? `${lab.segments} segments, free hosted vision model` : "every one"}</dd>
+                <dt className="text-sm text-ink-2">{lab ? "copied labels flagged with confidence by the AI reviewer" : "mistyped end times caught"}</dt>
+                <dd className="num mt-1 text-4xl font-semibold tracking-tight">{Math.round((lab ? (lab.tiers?.fix.recall ?? lab.recall) : t.summary.by_kind.truncated?.recall ?? 0) * 100)}%</dd>
+                <dd className="text-xs text-muted">{lab ? `while flagging ${Math.round((lab.tiers?.fix.false_flag_rate ?? lab.false_flag_rate) * 100)}% of real labels · Claude Haiku 5.5, ~$0.0002 per check` : "every one"}</dd>
               </div>
             </dl>
           )}
@@ -151,6 +160,31 @@ export default async function Landing() {
           </div>
         </section>
 
+
+        {/* World-model test */}
+        <section id="world" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
+          <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.15fr]">
+            <div>
+              <p className="eyebrow">Will it work as a robot scenario?</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">The annotation, rendered in a world model, in first person.</h2>
+              <p className="mt-4 text-ink-2">
+                A label can be right and still useless for training. SoloSim hands the segment&apos;s first real frame and its
+                annotation to Reactor&apos;s LingBot World 2, which generates the next seconds as the camera wearer would see them.
+                A vision judge then compares the render with what really happened, frame by frame.
+              </p>
+              <p className="mt-3 text-ink-2">
+                Where the hands fuse, the object morphs, or the action never happens, the tester sees exactly which frame failed and
+                why. “Wash cup” partly renders; “pour water into glass” does not: that is a scenario to re-capture, not to train on.
+              </p>
+              <p className="mt-4 text-sm text-muted">About $0.07 per render. Every render asks before it spends.</p>
+            </div>
+            <figure className="overflow-hidden rounded-2xl border border-line bg-[#0b0c0e]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/shots/render.jpg" alt="Real footage of washing a cup next to LingBot's render of the same annotation; frame 7 is highlighted: hands merged into a blurred, mitten-like shape gripping the cup."
+                className="w-full" width={1100} height={1224} loading="lazy" />
+            </figure>
+          </div>
+        </section>
         <section id="evidence" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
           <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
             <div>
@@ -174,8 +208,8 @@ export default async function Landing() {
               ))}
               {lab && (
                 <li>
-                  <div className="flex justify-between text-sm"><span>Wrong label (AI reviewer)</span><span className="num font-semibold">{Math.round(lab.recall * 100)}%</span></div>
-                  <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-accent" style={{ width: `${lab.recall * 100}%` }} /></div>
+                  <div className="flex justify-between text-sm"><span>Copied label (AI reviewer, confident)</span><span className="num font-semibold">{Math.round((lab.tiers?.fix.recall ?? lab.recall) * 100)}%</span></div>
+                  <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-accent" style={{ width: `${(lab.tiers?.fix.recall ?? lab.recall) * 100}%` }} /></div>
                 </li>
               )}
               {!t && <li className="text-sm text-muted">Start the engine to show the latest numbers.</li>}

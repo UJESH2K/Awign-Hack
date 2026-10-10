@@ -45,6 +45,7 @@ def main():
         for s in c.segments:
             if s.id in true and s.id in wrong:
                 rows.append({"clip": cid, "segment": s.id, "label": s.narration, "true_verdict": true[s.id]["verdict"],
+                             "true_conf": true[s.id].get("confidence"), "wrong_conf": wrong[s.id].get("confidence"),
                              "true_seen": true[s.id].get("observed_action"), "wrong_label": next(w.narration for w in swapped if w.id == s.id),
                              "wrong_verdict": wrong[s.id]["verdict"]})
         print(cid, len(rows), flush=True)
@@ -52,7 +53,13 @@ def main():
     ff = sum(r["true_verdict"] in FLAG for r in rows)
     rc = sum(r["wrong_verdict"] in FLAG for r in rows)
     unsure_t = sum(r["true_verdict"] == "unsure" for r in rows)
-    out = {"backend": which, "segments": n, "wrong_caught": rc, "recall": round(rc / max(1, n), 3),
+    tiers = {}
+    for name, th in (("fix", vlm.LABEL_FIX_CONF), ("check", vlm.LABEL_CHECK_CONF)):
+        c_ = sum(r["wrong_verdict"] in FLAG and (r["wrong_conf"] or 0) >= th for r in rows)
+        f_ = sum(r["true_verdict"] in FLAG and (r["true_conf"] or 0) >= th for r in rows)
+        tiers[name] = {"min_confidence": th, "wrong_caught": c_, "recall": round(c_ / max(1, n), 3),
+                       "true_flagged": f_, "false_flag_rate": round(f_ / max(1, n), 3)}
+    out = {"backend": which, "segments": n, "tiers": tiers, "wrong_caught": rc, "recall": round(rc / max(1, n), 3),
            "true_flagged": ff, "false_flag_rate": round(ff / max(1, n), 3), "true_unsure": unsure_t, "rows": rows}
     (DATA / "solosim" / f"label_bench_{which}.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
     print({k: v for k, v in out.items() if k != "rows"})

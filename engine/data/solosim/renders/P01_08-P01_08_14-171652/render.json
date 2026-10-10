@@ -195,10 +195,41 @@
   }
  ],
  "judge": {
-  "verdict": "unknown",
-  "failures": [],
-  "summary": "judge unavailable",
-  "renders_action": false
+  "renders_action": true,
+  "verdict": "partial",
+  "failures": [
+   {
+    "frame": 2,
+    "kind": "hands merged",
+    "what": "Both hands overlap and blend around the cup with unclear finger separation.",
+    "k": 2
+   },
+   {
+    "frame": 3,
+    "kind": "object morphed",
+    "what": "Cup appears as a larger white bowl-like object, not matching the real cup.",
+    "k": 4
+   },
+   {
+    "frame": 4,
+    "kind": "hands merged",
+    "what": "Hands are fused into a blurred, mitten-like shape gripping the cup.",
+    "k": 6
+   },
+   {
+    "frame": 5,
+    "kind": "object morphed",
+    "what": "Cup interior looks filled with white foam, shape and rim inconsistent.",
+    "k": 8
+   },
+   {
+    "frame": 6,
+    "kind": "object morphed",
+    "what": "Cup is oversized and lacks the handle and detail of the real cup.",
+    "k": 11
+   }
+  ],
+  "summary": "Render shows a plausible sink scene and washing motion, but hands merge and the cup deforms, weakening it as training data."
  },
  "drift_from": null,
  "usage": {

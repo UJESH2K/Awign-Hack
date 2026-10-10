@@ -138,6 +138,7 @@ export const KIND_LABEL: Record<string, string> = {
   "hands out of view": "Hands off-screen",
   face: "Face visible",
   "label mismatch": "Wrong label",
+  "label doubtful": "Label doubtful",
   "action not visible": "Action not visible",
 };
 

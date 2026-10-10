@@ -15,6 +15,7 @@ type Bench = {
   } | null;
   labels: Record<string, {
     backend: string; segments: number; wrong_caught: number; recall: number; true_flagged: number; false_flag_rate: number; true_unsure: number;
+    tiers?: Record<"fix" | "check", { min_confidence: number; wrong_caught: number; recall: number; true_flagged: number; false_flag_rate: number }>;
     rows: { clip: string; label: string; true_verdict: string; true_seen: string; wrong_label: string; wrong_verdict: string }[];
   } | null>;
 };
@@ -52,7 +53,7 @@ export default function BenchPage() {
     getJSON<Bench>("/bench").then(setB).catch(() => setB({ timing: null, labels: {} }));
   }, []);
   const t = b?.timing;
-  const lab = b?.labels.groq ?? b?.labels.claude ?? null;
+  const lab = b?.labels.haiku ?? b?.labels.groq ?? b?.labels.claude ?? null;
   const disagreements = (lab?.rows ?? []).filter((r) => r.true_verdict.startsWith("wrong")).slice(0, 8);
 
   return (
@@ -106,13 +107,32 @@ export default function BenchPage() {
               <>
                 <p className="mt-1 text-sm text-ink-2">
                   Every segment checked twice: once with its real label, once with a label copied from another action in the same
-                  video ({lab.segments} segments, {lab.backend === "groq" ? "Qwen 3.8 27B on Groq, free tier" : lab.backend}).
+                  video ({lab.segments} segments, {lab.backend === "haiku" ? "Claude Haiku 5.5, about $0.0002 per check" : lab.backend === "groq" ? "Qwen 3.8 27B on Groq" : lab.backend}).
                 </p>
                 <div className="mt-4">
-                  <Bars items={[
-                    { label: "Wrong labels flagged", value: lab.recall, note: `${lab.wrong_caught} of ${lab.segments}` },
-                    { label: "Real labels flagged (disagreements)", value: lab.false_flag_rate, note: `${lab.true_flagged} of ${lab.segments}; ${lab.true_unsure} marked unsure` },
-                  ]} />
+                  {lab.tiers ? (
+                    <div className="space-y-5">
+                      <div>
+                        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Confident flags (shown as “fix”, confidence ≥ {lab.tiers.fix.min_confidence})</h3>
+                        <Bars items={[
+                          { label: "Wrong labels caught", value: lab.tiers.fix.recall, note: `${lab.tiers.fix.wrong_caught} of ${lab.segments}` },
+                          { label: "Real labels flagged", value: lab.tiers.fix.false_flag_rate, note: `${lab.tiers.fix.true_flagged} of ${lab.segments}` },
+                        ]} />
+                      </div>
+                      <div>
+                        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Including doubtful (shown as “check”, ≥ {lab.tiers.check.min_confidence})</h3>
+                        <Bars items={[
+                          { label: "Wrong labels caught", value: lab.tiers.check.recall, note: `${lab.tiers.check.wrong_caught} of ${lab.segments}` },
+                          { label: "Real labels flagged", value: lab.tiers.check.false_flag_rate, note: `${lab.tiers.check.true_flagged} of ${lab.segments}` },
+                        ]} />
+                      </div>
+                    </div>
+                  ) : (
+                    <Bars items={[
+                      { label: "Wrong labels flagged", value: lab.recall, note: `${lab.wrong_caught} of ${lab.segments}` },
+                      { label: "Real labels flagged (disagreements)", value: lab.false_flag_rate, note: `${lab.true_flagged} of ${lab.segments}` },
+                    ]} />
+                  )}
                 </div>
                 <p className="mt-3 text-[11px] text-muted">
                   A flagged real label is not always a model error: EPIC narrations are loose (“put down cup” while the cup is being
