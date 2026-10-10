@@ -1,0 +1,396 @@
+{
+ "title": "EPIC-KITCHENS P01_08",
+ "task": "kitchen activities, first-person (head-mounted GoPro)",
+ "source": {
+  "dataset": "EPIC-KITCHENS-100",
+  "video_id": "P01_08",
+  "licence": "CC BY-NC 4.0",
+  "annotation": "official narrated action segments (start/stop, verb, noun)"
+ },
+ "segments": [
+  {
+   "id": "P01_08_0",
+   "start": 0.71,
+   "end": 2.42,
+   "verb": "take",
+   "noun": "cereal bar",
+   "narration": "take cereal bar",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 265
+   }
+  },
+  {
+   "id": "P01_08_1",
+   "start": 2.52,
+   "end": 5.73,
+   "verb": "fold",
+   "noun": "cereal bar",
+   "narration": "fold cereal bar",
+   "meta": {
+    "verb_class": 28,
+    "noun_class": 265
+   }
+  },
+  {
+   "id": "P01_08_2",
+   "start": 6.89,
+   "end": 12.73,
+   "verb": "put-into",
+   "noun": "cereal bar",
+   "narration": "put cereal bar into box",
+   "meta": {
+    "verb_class": 5,
+    "noun_class": 265
+   }
+  },
+  {
+   "id": "P01_08_3",
+   "start": 13.05,
+   "end": 14.92,
+   "verb": "close",
+   "noun": "box",
+   "narration": "close box",
+   "meta": {
+    "verb_class": 4,
+    "noun_class": 23
+   }
+  },
+  {
+   "id": "P01_08_4",
+   "start": 18.41,
+   "end": 19.47,
+   "verb": "open",
+   "noun": "cupboard",
+   "narration": "open cupboard",
+   "meta": {
+    "verb_class": 3,
+    "noun_class": 3
+   }
+  },
+  {
+   "id": "P01_08_5",
+   "start": 20.23,
+   "end": 22.53,
+   "verb": "put-into",
+   "noun": "cereal",
+   "narration": "put cereals into cupboard",
+   "meta": {
+    "verb_class": 5,
+    "noun_class": 99
+   }
+  },
+  {
+   "id": "P01_08_6",
+   "start": 22.62,
+   "end": 23.68,
+   "verb": "close",
+   "noun": "cupboard",
+   "narration": "close cupboard",
+   "meta": {
+    "verb_class": 4,
+    "noun_class": 3
+   }
+  },
+  {
+   "id": "P01_08_7",
+   "start": 24.42,
+   "end": 25.87,
+   "verb": "move",
+   "noun": "floor",
+   "narration": "move",
+   "meta": {
+    "verb_class": 11,
+    "noun_class": 159
+   }
+  },
+  {
+   "id": "P01_08_8",
+   "start": 26.35,
+   "end": 28.83,
+   "verb": "take",
+   "noun": "cup",
+   "narration": "take cup",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 13
+   }
+  },
+  {
+   "id": "P01_08_9",
+   "start": 28.94,
+   "end": 29.91,
+   "verb": "put-down",
+   "noun": "cup",
+   "narration": "put down cup",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 13
+   }
+  },
+  {
+   "id": "P01_08_10",
+   "start": 30.01,
+   "end": 30.92,
+   "verb": "take",
+   "noun": "up washing liquid",
+   "narration": "take washing up liquid",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 22
+   }
+  },
+  {
+   "id": "P01_08_11",
+   "start": 31.37,
+   "end": 33.42,
+   "verb": "pour",
+   "noun": "up washing liquid",
+   "narration": "pour washing up liquid",
+   "meta": {
+    "verb_class": 9,
+    "noun_class": 22
+   }
+  },
+  {
+   "id": "P01_08_12",
+   "start": 32.4,
+   "end": 34.23,
+   "verb": "put-down",
+   "noun": "liquid",
+   "narration": "put down liquid",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 150
+   }
+  },
+  {
+   "id": "P01_08_13",
+   "start": 34.33,
+   "end": 36.31,
+   "verb": "turn-on",
+   "noun": "tap",
+   "narration": "turn on tap",
+   "meta": {
+    "verb_class": 6,
+    "noun_class": 0
+   }
+  },
+  {
+   "id": "P01_08_14",
+   "start": 36.41,
+   "end": 45.78,
+   "verb": "wash",
+   "noun": "cup",
+   "narration": "wash cup",
+   "meta": {
+    "verb_class": 2,
+    "noun_class": 13
+   }
+  },
+  {
+   "id": "P01_08_15",
+   "start": 44.4,
+   "end": 46.96,
+   "verb": "rinse",
+   "noun": "spoon",
+   "narration": "rinse spoon",
+   "meta": {
+    "verb_class": 2,
+    "noun_class": 1
+   }
+  },
+  {
+   "id": "P01_08_16",
+   "start": 46.56,
+   "end": 48.08,
+   "verb": "put-into",
+   "noun": "spoon",
+   "narration": "put spoon into rack",
+   "meta": {
+    "verb_class": 5,
+    "noun_class": 1
+   }
+  },
+  {
+   "id": "P01_08_17",
+   "start": 48.18,
+   "end": 59.28,
+   "verb": "rinse",
+   "noun": "cup",
+   "narration": "rinse cup",
+   "meta": {
+    "verb_class": 2,
+    "noun_class": 13
+   }
+  },
+  {
+   "id": "P01_08_18",
+   "start": 59.38,
+   "end": 60.1,
+   "verb": "turn-off",
+   "noun": "tap",
+   "narration": "turn off tap",
+   "meta": {
+    "verb_class": 8,
+    "noun_class": 0
+   }
+  },
+  {
+   "id": "P01_08_19",
+   "start": 60.2,
+   "end": 62.15,
+   "verb": "put-down",
+   "noun": "cup",
+   "narration": "put down cup",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 13
+   }
+  },
+  {
+   "id": "P01_08_20",
+   "start": 62.61,
+   "end": 70.11,
+   "verb": "dry",
+   "noun": "hand",
+   "narration": "dry hands",
+   "meta": {
+    "verb_class": 14,
+    "noun_class": 11
+   }
+  },
+  {
+   "id": "P01_08_21",
+   "start": 68.58,
+   "end": 70.47,
+   "verb": "hang",
+   "noun": "cloth",
+   "narration": "hang cloth",
+   "meta": {
+    "verb_class": 41,
+    "noun_class": 17
+   }
+  },
+  {
+   "id": "P01_08_22",
+   "start": 71.61,
+   "end": 72.81,
+   "verb": "take",
+   "noun": "table cloth",
+   "narration": "take table cloth",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 17
+   }
+  },
+  {
+   "id": "P01_08_23",
+   "start": 72.91,
+   "end": 78.41,
+   "verb": "fold",
+   "noun": "table cloth",
+   "narration": "fold table cloth",
+   "meta": {
+    "verb_class": 28,
+    "noun_class": 17
+   }
+  },
+  {
+   "id": "P01_08_24",
+   "start": 79.8,
+   "end": 80.66,
+   "verb": "put-into",
+   "noun": "table cloth",
+   "narration": "put table cloth into cupboard",
+   "meta": {
+    "verb_class": 5,
+    "noun_class": 17
+   }
+  },
+  {
+   "id": "P01_08_25",
+   "start": 82.38,
+   "end": 83.0,
+   "verb": "take",
+   "noun": "glass",
+   "narration": "take glass",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 10
+   }
+  },
+  {
+   "id": "P01_08_26",
+   "start": 82.99,
+   "end": 84.34,
+   "verb": "take",
+   "noun": "bottle",
+   "narration": "take bottle",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 15
+   }
+  },
+  {
+   "id": "P01_08_27",
+   "start": 84.71,
+   "end": 88.48,
+   "verb": "pour-into",
+   "noun": "water",
+   "narration": "pour water into glass",
+   "meta": {
+    "verb_class": 9,
+    "noun_class": 27
+   }
+  },
+  {
+   "id": "P01_08_28",
+   "start": 88.58,
+   "end": 90.39,
+   "verb": "put-down",
+   "noun": "bottle",
+   "narration": "put down bottle",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 15
+   }
+  },
+  {
+   "id": "P01_08_29",
+   "start": 89.46,
+   "end": 91.92,
+   "verb": "drink",
+   "noun": "water",
+   "narration": "drink water",
+   "meta": {
+    "verb_class": 60,
+    "noun_class": 27
+   }
+  },
+  {
+   "id": "P01_08_30",
+   "start": 91.87,
+   "end": 92.76,
+   "verb": "close",
+   "noun": "bottle",
+   "narration": "close bottle",
+   "meta": {
+    "verb_class": 4,
+    "noun_class": 15
+   }
+  },
+  {
+   "id": "P01_08_31",
+   "start": 96.78,
+   "end": 98.31,
+   "verb": "put-down",
+   "noun": "glass",
+   "narration": "put down glass",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 10
+   }
+  }
+ ]
+}

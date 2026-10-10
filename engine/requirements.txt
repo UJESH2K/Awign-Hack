@@ -1,0 +1,14 @@
+fastapi>=0.115
+uvicorn>=0.30
+python-multipart
+pydantic
+numpy
+opencv-python
+pillow
+torch
+torchvision
+ultralytics
+clip @ git+https://github.com/ultralytics/CLIP.git
+anthropic>=1.5
+reactor-sdk==1.8.0
+playwright  # optional: scripts/shot.py screenshots

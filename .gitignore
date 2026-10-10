@@ -1,0 +1,18 @@
+.env
+.env.local
+.env*.local
+engine/.venv/
+__pycache__/
+*.pyc
+node_modules/
+web/.next/
+
+# Engine data: keep what the demo needs, never raw downloads or v1 leftovers.
+engine/data/*
+!engine/data/solosim/
+engine/data/solosim/clips/*/*.tmp
+engine/data/solosim/clips/*/tmp*
+!engine/data/weights/
+engine/data/weights/*
+!engine/data/weights/hand_yolov8n.pt
+!engine/data/weights/face_yolov8n.pt

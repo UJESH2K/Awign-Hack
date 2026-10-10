@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+/* Light (landing page). Surfaces and ink follow the dataviz reference palette. */
+:root {
+  color-scheme: light;
+  --bg: #f9f9f7;
+  --surface: #fcfcfb;
+  --surface-2: #f2f1ed;
+  --line: #e1e0d9;
+  --line-strong: #c3c2b7;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #6f6d68;
+  --accent: #2a78d6;
+  --accent-ink: #ffffff;
+  --accent-fill: #256abf; /* filled buttons: white text at 5.4:1 */
+  --accent-soft: #e6effb;
+  --focus: #2a78d6;
+  --clear: #0ca30c;
+  --caution: #fab219;
+  --warning: #f06a1d;
+  --collision: #c2253d;
+  --anomaly: #9085e9;
+}
+
+/* Dark (simulator). Its own validated steps, not an inverted light theme. */
+.sim {
+  color-scheme: dark;
+  --bg: #0b0c0e;
+  --surface: #131417;
+  --surface-2: #1b1c20;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --ink: #f4f4f2;
+  --ink-2: #c3c2b7;
+  --muted: #8f8d87;
+  --accent: #3987e5;
+  --accent-ink: #ffffff;
+  --accent-fill: #256abf;
+  --accent-soft: rgba(57, 135, 229, 0.16);
+  --focus: #6da7ec;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-fill: var(--accent-fill);
+  --color-clear: var(--clear);
+  --color-caution: var(--caution);
+  --color-warning: var(--warning);
+  --color-collision: var(--collision);
+  --color-anomaly: var(--anomaly);
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Hover/focus tooltip for icon buttons: <span class="tip" data-tip="Zoom in">…</span> */
+.tip {
+  position: relative;
+}
+.tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translate(-50%, 4px);
+  white-space: nowrap;
+  background: #0b0c0e;
+  color: #f4f4f2;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 12px;
+  line-height: 1;
+  padding: 6px 8px;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+  z-index: 50;
+}
+.tip:hover::after,
+.tip:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.tip[data-tip-side="bottom"]::after {
+  top: calc(100% + 8px);
+  bottom: auto;
+  transform: translate(-50%, -4px);
+}
+.tip[data-tip-side="bottom"]:hover::after,
+.tip[data-tip-side="bottom"]:focus-visible::after {
+  transform: translate(-50%, 0);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise {
+  animation: rise 240ms ease-out both;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.pulse {
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.tip[data-tip-align="end"]::after {
+  left: auto;
+  right: 0;
+  transform: translate(0, -4px);
+}
+.tip[data-tip-align="end"]:hover::after,
+.tip[data-tip-align="end"]:focus-visible::after {
+  transform: translate(0, 0);
+}
+
+/* Square icon control (player, timeline zoom). */
+.ctl {
+  display: inline-grid;
+  place-items: center;
+  height: 2.25rem;
+  width: 2.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.ctl:hover:not(:disabled) {
+  border-color: var(--line-strong);
+}
+.ctl:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
