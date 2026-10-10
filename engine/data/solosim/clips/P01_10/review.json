@@ -1,0 +1,327 @@
+{
+ "decisions": [
+  {
+   "at": "2026-10-10 17:43:44",
+   "segment": null,
+   "issue": "i6",
+   "kind": "unlabelled activity",
+   "action": "apply",
+   "values": {},
+   "note": ""
+  }
+ ],
+ "original": [
+  {
+   "id": "P01_10_0",
+   "start": 1.41,
+   "end": 3.79,
+   "verb": "open",
+   "noun": "oven",
+   "narration": "open oven",
+   "meta": {
+    "verb_class": 3,
+    "noun_class": 46
+   }
+  },
+  {
+   "id": "P01_10_1",
+   "start": 3.1,
+   "end": 7.52,
+   "verb": "turn-off",
+   "noun": "oven",
+   "narration": "turn off oven",
+   "meta": {
+    "verb_class": 8,
+    "noun_class": 46
+   }
+  },
+  {
+   "id": "P01_10_2",
+   "start": 7.12,
+   "end": 8.95,
+   "verb": "take",
+   "noun": "pot holder",
+   "narration": "take pot holder",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 24
+   }
+  },
+  {
+   "id": "P01_10_3",
+   "start": 8.0,
+   "end": 10.25,
+   "verb": "take",
+   "noun": "pot holder",
+   "narration": "take pot holder",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 24
+   }
+  },
+  {
+   "id": "P01_10_4",
+   "start": 9.78,
+   "end": 10.53,
+   "verb": "put-down",
+   "noun": "pot holder",
+   "narration": "put down pot holder",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 24
+   }
+  },
+  {
+   "id": "P01_10_5",
+   "start": 10.1,
+   "end": 13.68,
+   "verb": "take",
+   "noun": "pizza",
+   "narration": "take pizza",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 91
+   }
+  },
+  {
+   "id": "P01_10_6",
+   "start": 13.28,
+   "end": 16.43,
+   "verb": "put-down",
+   "noun": "pizza",
+   "narration": "put down pizza",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 91
+   }
+  },
+  {
+   "id": "P01_10_7",
+   "start": 20.58,
+   "end": 26.35,
+   "verb": "take-out",
+   "noun": "pizza",
+   "narration": "take pizza out of the oven",
+   "meta": {
+    "verb_class": 12,
+    "noun_class": 91
+   }
+  },
+  {
+   "id": "P01_10_8",
+   "start": 27.09,
+   "end": 28.08,
+   "verb": "put-down",
+   "noun": "pizza",
+   "narration": "put down pizza",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 91
+   }
+  },
+  {
+   "id": "P01_10_9",
+   "start": 28.96,
+   "end": 31.87,
+   "verb": "close",
+   "noun": "oven",
+   "narration": "close oven",
+   "meta": {
+    "verb_class": 4,
+    "noun_class": 46
+   }
+  },
+  {
+   "id": "P01_10_10",
+   "start": 32.51,
+   "end": 33.51,
+   "verb": "put-down",
+   "noun": "pot holder",
+   "narration": "put down pot holder",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 24
+   }
+  },
+  {
+   "id": "P01_10_11",
+   "start": 33.02,
+   "end": 34.64,
+   "verb": "take",
+   "noun": "basil leaf",
+   "narration": "take basil leaves",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 62
+   }
+  },
+  {
+   "id": "P01_10_12",
+   "start": 34.58,
+   "end": 42.0,
+   "verb": "spread-onto",
+   "noun": "basil",
+   "narration": "spread basil onto pizza",
+   "meta": {
+    "verb_class": 27,
+    "noun_class": 201
+   }
+  },
+  {
+   "id": "P01_10_13",
+   "start": 45.24,
+   "end": 47.26,
+   "verb": "throw-into",
+   "noun": "bin",
+   "narration": "throw something into bin",
+   "meta": {
+    "verb_class": 13,
+    "noun_class": 36
+   }
+  },
+  {
+   "id": "P01_10_14",
+   "start": 49.38,
+   "end": 50.56,
+   "verb": "take",
+   "noun": "spatula",
+   "narration": "take spatula",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 20
+   }
+  },
+  {
+   "id": "P01_10_15",
+   "start": 52.55,
+   "end": 61.11,
+   "verb": "cut",
+   "noun": "pizza",
+   "narration": "cut pizza",
+   "meta": {
+    "verb_class": 7,
+    "noun_class": 91
+   }
+  },
+  {
+   "id": "P01_10_16",
+   "start": 55.17,
+   "end": 72.12,
+   "verb": "cut",
+   "noun": "pizza",
+   "narration": "continue cutting pizza",
+   "meta": {
+    "verb_class": 7,
+    "noun_class": 91
+   }
+  },
+  {
+   "id": "P01_10_17",
+   "start": 72.22,
+   "end": 88.07,
+   "verb": "cut",
+   "noun": "pizza",
+   "narration": "still cutting pizza",
+   "meta": {
+    "verb_class": 7,
+    "noun_class": 91
+   }
+  },
+  {
+   "id": "P01_10_18",
+   "start": 92.89,
+   "end": 95.11,
+   "verb": "move",
+   "noun": "cutlery",
+   "narration": "move cutlery",
+   "meta": {
+    "verb_class": 11,
+    "noun_class": 58
+   }
+  },
+  {
+   "id": "P01_10_19",
+   "start": 94.95,
+   "end": 96.24,
+   "verb": "take",
+   "noun": "plate",
+   "narration": "take plate",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 2
+   }
+  },
+  {
+   "id": "P01_10_20",
+   "start": 97.29,
+   "end": 98.74,
+   "verb": "put-on",
+   "noun": "plate",
+   "narration": "put on plate",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 2
+   }
+  },
+  {
+   "id": "P01_10_21",
+   "start": 98.81,
+   "end": 113.34,
+   "verb": "take",
+   "noun": "pizza slice",
+   "narration": "take pizza slice",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 91
+   }
+  },
+  {
+   "id": "P01_10_22",
+   "start": 113.38,
+   "end": 116.35,
+   "verb": "put-onto",
+   "noun": "pizza slice",
+   "narration": "put pizza slice onto plate",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 91
+   }
+  },
+  {
+   "id": "P01_10_23",
+   "start": 116.45,
+   "end": 129.4,
+   "verb": "take",
+   "noun": "pizza slice",
+   "narration": "take pizza slice",
+   "meta": {
+    "verb_class": 0,
+    "noun_class": 91
+   }
+  },
+  {
+   "id": "P01_10_24",
+   "start": 129.5,
+   "end": 131.97,
+   "verb": "put-onto",
+   "noun": "pizza slice",
+   "narration": "put pizza slice onto plate",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 91
+   }
+  },
+  {
+   "id": "P01_10_25",
+   "start": 134.79,
+   "end": 137.67,
+   "verb": "put-down",
+   "noun": "plate",
+   "narration": "put down plate",
+   "meta": {
+    "verb_class": 1,
+    "noun_class": 2
+   }
+  }
+ ]
+}

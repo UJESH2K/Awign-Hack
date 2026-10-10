@@ -1,0 +1,78 @@
+{
+ "title": "No annotations uploaded: AI first pass (45 s of EPIC P01_03)",
+ "task": "home kitchen, first-person",
+ "source": {
+  "dataset": "upload",
+  "filename": "pov-test.mp4",
+  "annotation_file": "AI first pass",
+  "note": "cut from EPIC-KITCHENS P01_03, 1:00-1:45, uploaded without annotations"
+ },
+ "segments": [
+  {
+   "id": "ai-000",
+   "start": 4.8,
+   "end": 6.01,
+   "verb": "carry",
+   "noun": "milk carton",
+   "narration": "carry milk carton",
+   "meta": {
+    "drafted_by": "ai"
+   }
+  },
+  {
+   "id": "ai-001",
+   "start": 6.61,
+   "end": 9.81,
+   "verb": "open",
+   "noun": "fridge door",
+   "narration": "open fridge door",
+   "meta": {
+    "drafted_by": "ai"
+   }
+  },
+  {
+   "id": "ai-002",
+   "start": 10.61,
+   "end": 16.42,
+   "verb": "take",
+   "noun": "milk from fridge",
+   "narration": "take milk from fridge",
+   "meta": {
+    "drafted_by": "ai"
+   }
+  },
+  {
+   "id": "ai-003",
+   "start": 19.42,
+   "end": 25.23,
+   "verb": "open",
+   "noun": "cabinet door",
+   "narration": "open cabinet door",
+   "meta": {
+    "drafted_by": "ai"
+   }
+  },
+  {
+   "id": "ai-004",
+   "start": 26.63,
+   "end": 27.63,
+   "verb": "take",
+   "noun": "green cloth from cabinet",
+   "narration": "take green cloth from cabinet",
+   "meta": {
+    "drafted_by": "ai"
+   }
+  },
+  {
+   "id": "ai-005",
+   "start": 30.63,
+   "end": 31.83,
+   "verb": "pick",
+   "noun": "up white cloth",
+   "narration": "pick up white cloth",
+   "meta": {
+    "drafted_by": "ai"
+   }
+  }
+ ]
+}

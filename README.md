@@ -47,6 +47,26 @@ label copied from another action in the same video; results on the Evidence page
 What it cannot do yet: starts that slide into the previous action without idle time, and fine
 verbs at 456×256 (the public EPIC copy). Awign captures in 4K.
 
+## Demo script (5 minutes)
+
+1. **Landing (30 s).** The bottleneck in robot data is checking, not capture. SoloSim sits between
+   the annotator and QA. Point at the measured numbers.
+2. **Review queue (20 s).** Four real first-person clips already checked: readiness score, how many
+   segments auto-passed, how many need a tester.
+3. **Reviewer, P01_08 (2 min).** Press *Next*: the footage jumps to the exact moment ("Ends 2.5 s after
+   the hands stop"), the hands are boxed, *Apply* moves the end in one click and the timeline
+   re-checks. Show a *Missed action* (hand activity nobody labelled → *Apply* adds the segment) and
+   a *Wrong label* with what the AI reviewer actually sees. On "open oven" in P01_10, *Ask Claude*:
+   the automatic reviewer flagged it, Claude Opus says it is correct; the tester decides.
+4. **World-model test (1 min).** Select "wash cup" → the LingBot render next to the real footage,
+   frame 7 "hands merged", frame 12 "cup oversized, no handle": this annotation is not yet a usable
+   robot scenario. (A new render asks before spending ~$0.07.)
+5. **Export (10 s).** Client-ready JSON: every segment, its QA status, reasons, the review trail.
+6. **Evidence (40 s).** 500 planted timing slips, 65% caught at 2.6% false flags; copied labels 53%
+   caught at 3% false flags; what it cannot do yet.
+7. **Live, optional.** Upload a clip without annotations: the AI first pass drafts segments, the
+   gate checks them, then plant a mistake (*Start = playhead* two seconds early) and watch it get flagged.
+
 ## Run
 
 ```bash

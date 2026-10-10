@@ -178,7 +178,7 @@ export default function ReviewPage() {
   const groqOpinion = (sid: string) => rep?.label.results?.[sid];
 
   return (
-    <div className="sim flex min-h-screen flex-col bg-bg text-ink">
+    <div className="sim flex min-h-screen flex-col overflow-x-clip bg-bg text-ink">
       <AppHeader>
         <div className="flex min-w-0 items-center gap-3">
           <Link href="/queue" className="hidden text-sm text-muted hover:text-ink md:inline">Queue /</Link>

@@ -240,7 +240,8 @@ async def decide(cid: str, d: Decision):
         sug = issue["suggestion"]
         if sug["field"] == "add":
             v = sug["value"]
-            segs.append(Segment(id=f"added-{int(time.time())}", start=v["start"], end=v["end"], verb=d.values.get("verb", "?"),
+            d.segment = f"added-{int(time.time())}"
+            segs.append(Segment(id=d.segment, start=v["start"], end=v["end"], verb=d.values.get("verb", "?"),
                                 noun=d.values.get("noun", ""), narration=d.values.get("narration", "unlabelled action (to name)"),
                                 meta={"added_by": "qa"}))
         else:
@@ -264,7 +265,8 @@ async def decide(cid: str, d: Decision):
         segs = [g for g in segs if g.id != d.segment]
     elif d.action == "add":
         label = str(d.values.get("narration") or "unnamed action")
-        segs.append(Segment(id=f"qa-{int(time.time() * 1000) % 10_000_000}", start=float(d.values["start"]), end=float(d.values["end"]),
+        d.segment = f"qa-{int(time.time() * 1000) % 10_000_000}"
+        segs.append(Segment(id=d.segment, start=float(d.values["start"]), end=float(d.values["end"]),
                             verb=label.split()[0], noun=" ".join(label.split()[1:]), narration=label, meta={"added_by": "qa"}))
     if d.action in ("apply", "edit", "reject", "add"):
         c.save_segments(sorted(segs, key=lambda s: s.start))
