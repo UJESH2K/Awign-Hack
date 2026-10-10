@@ -19,15 +19,16 @@ export function Logo({ className = "" }: { className?: string }) {
 }
 
 const LINKS = [
-  { href: "/queue", label: "Review queue" },
-  { href: "/bench", label: "Evidence" },
+  { href: "/annotator", label: "Annotator", short: "Annotate" },
+  { href: "/qa", label: "QA Analyst", short: "QA" },
+  { href: "/bench", label: "Evidence", short: "Evidence" },
 ];
 
 export function AppHeader({ children }: { children?: React.ReactNode }) {
   const path = usePathname();
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-4 px-4">
+      <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-2 px-3 sm:gap-4 sm:px-4">
         <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="SoloSim home">
           <Logo />
           <span className="hidden rounded-md bg-surface-2 px-1.5 py-0.5 text-[11px] text-muted sm:inline">pre-QA for first-person data</span>
@@ -35,11 +36,12 @@ export function AppHeader({ children }: { children?: React.ReactNode }) {
         <div className="min-w-0 flex-1">{children}</div>
         <nav aria-label="Main" className="flex shrink-0 items-center gap-1 text-sm">
           {LINKS.map((l) => {
-            const on = path === l.href || path.startsWith(l.href + "/") || (l.href === "/queue" && path.startsWith("/review"));
+            const on = path === l.href || path.startsWith(l.href + "/") || ((l.href === "/annotator" || l.href === "/qa") && path.startsWith("/review"));
             return (
               <Link key={l.href} href={l.href} aria-current={on ? "page" : undefined}
-                className={`whitespace-nowrap rounded-md px-2.5 py-1.5 transition ${on ? "bg-surface-2 text-ink" : "text-muted hover:text-ink"}`}>
-                {l.label}
+                className={`whitespace-nowrap rounded-md px-2 py-1.5 text-[13px] font-medium transition sm:px-2.5 sm:text-sm ${on ? "bg-surface-2 text-ink" : "text-muted hover:text-ink"}`}>
+                <span className="sm:hidden">{l.short}</span>
+                <span className="hidden sm:inline">{l.label}</span>
               </Link>
             );
           })}

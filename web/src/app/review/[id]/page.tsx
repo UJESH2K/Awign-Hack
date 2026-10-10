@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Download, Loader2, Play, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Download, Loader2, Play, Plus, RefreshCw, RotateCcw, Send, Sparkles, Trash2, Wand2 } from "lucide-react";
 import { AppHeader } from "@/components/Brand";
+import { Count, Reveal } from "@/components/Motion";
 import { IssueCard } from "@/components/review/IssueCard";
-import { Player, type PlayerHandle } from "@/components/review/Player";
+import { Player, type PlayerHandle, type View } from "@/components/review/Player";
 import { RenderPanel } from "@/components/review/RenderPanel";
 import { Timeline } from "@/components/review/Timeline";
 import { ENGINE_URL, STATUS, fmt, getJSON, postJSON, type ClipDetail, type Issue, type LabelOpinion, type Track } from "@/lib/solosim";
@@ -29,6 +30,8 @@ function Opinion({ o, title }: { o: LabelOpinion; title: string }) {
 
 export default function ReviewPage() {
   const { id } = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+  const role = searchParams.get("role") ?? "annotator";
   const [d, setD] = useState<ClipDetail | null>(null);
   const [track, setTrack] = useState<Track | null>(null);
   const [time, setTime] = useState(0);
@@ -36,6 +39,7 @@ export default function ReviewPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("open");
   const [busy, setBusy] = useState(false);
+  const [view, setView] = useState<View>("fit");
   const [error, setError] = useState<string | null>(null);
   const [claude, setClaude] = useState<Record<string, LabelOpinion>>({});
   const [claudeBusy, setClaudeBusy] = useState<string | null>(null);
@@ -92,6 +96,43 @@ export default function ReviewPage() {
     if (i.segment) setSelected(i.segment);
     player.current?.seek(Math.max(0, i.t - 0.4));
   }, []);
+
+  const deepIssue = searchParams.get("issue");
+  const deepDone = useRef(false);
+  useEffect(() => {
+    if (deepDone.current || !deepIssue || !rep) return;
+    const i = rep.issues.find((x) => x.id === deepIssue);
+    if (!i) return;
+    deepDone.current = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFilter("all");
+    const t = setTimeout(() => {
+      goto(i);
+      document.getElementById(`issue-${i.id}`)?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, 400);
+    return () => clearTimeout(t);
+  }, [deepIssue, rep, goto]);
+
+  async function wf(action: string, extra: Record<string, string> = {}) {
+    setBusy(true); setError(null);
+    try { setD(await postJSON<ClipDetail>(`/clips/${id}/workflow`, { action, ...extra })); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+
+  async function submitToQA() {
+    if (open.length && !confirm(`${open.length} flagged issue${open.length > 1 ? "s are" : " is"} still open. QA will see them. Submit anyway?`)) return;
+    let annotator = "";
+    try { annotator = localStorage.getItem("solosim_annotator") || ""; } catch {}
+    await wf("submit", { annotator });
+  }
+
+  async function autofix() {
+    setBusy(true); setError(null);
+    try {
+      const r = await postJSON<ClipDetail & { autofixed: number }>(`/clips/${id}/autofix`);
+      setD(r);
+      setError(r.autofixed ? null : "Nothing left that can be fixed automatically.");
+    } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
 
   // Keyboard: N = next open issue.
   useEffect(() => {
@@ -181,7 +222,7 @@ export default function ReviewPage() {
     <div className="sim flex min-h-screen flex-col overflow-x-clip bg-bg text-ink">
       <AppHeader>
         <div className="flex min-w-0 items-center gap-3">
-          <Link href="/queue" className="hidden text-sm text-muted hover:text-ink md:inline">Queue /</Link>
+          <Link href={role === "qa" ? "/qa" : "/annotator"} className="hidden text-sm text-muted hover:text-ink md:inline">{role === "qa" ? "QA" : "Annotator"} /</Link>
           <h1 className="truncate text-sm font-semibold">{d.clip.title}</h1>
           <span className="num hidden text-xs text-muted lg:inline">{fmt(d.clip.duration)} · {segs.length} segments · {d.clip.width}×{d.clip.height}</span>
         </div>
@@ -194,29 +235,37 @@ export default function ReviewPage() {
         </div>
       )}
 
-      <div className="mx-auto grid w-full max-w-[1600px] flex-1 gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_420px]">
+      <div className={`mx-auto grid w-full flex-1 gap-4 p-4 ${view === "theater" ? "max-w-[1400px]" : "max-w-[1600px] lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)] xl:grid-cols-[minmax(0,1fr)_440px]"}`}>
         {/* ----------------------------------------------------------- left: footage + timeline */}
         <main className="flex min-w-0 flex-col gap-3">
           {s && (
-            <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-5">
+            <Reveal className="grid grid-cols-2 gap-px overflow-hidden rounded-[14px] border border-line bg-line shadow-[var(--shadow-1)] sm:grid-cols-3 lg:grid-cols-6">
               <div className="bg-surface px-4 py-2.5">
                 <div className="text-[11px] text-muted">Robot-readiness</div>
-                <div className="num text-2xl font-semibold">{s.readiness}<span className="text-sm text-muted">/100</span></div>
+                <div className="num text-2xl font-semibold"><Count to={s.readiness} /><span className="text-sm text-muted">/100</span></div>
               </div>
               {(["pass", "check", "fix"] as const).map((k) => (
                 <div key={k} className="bg-surface px-4 py-2.5">
                   <div className="flex items-center gap-1.5 text-[11px] text-muted"><span className="h-2 w-2 rounded-full" style={{ background: STATUS[k].color }} />{k === "pass" ? "Auto-passed" : k === "check" ? "To look at" : "To fix"}</div>
-                  <div className="num text-2xl font-semibold">{s[k]}<span className="text-sm text-muted"> seg</span></div>
+                  <div className="num text-2xl font-semibold"><Count to={s[k]} duration={0.7} /><span className="text-sm text-muted"> seg</span></div>
                 </div>
               ))}
-              <div className="col-span-2 bg-surface px-4 py-2.5 sm:col-span-1">
+              <div className="bg-surface px-4 py-2.5">
                 <div className="text-[11px] text-muted">Reviewer watches</div>
                 <div className="num text-2xl font-semibold">{Math.round(s.review_share * 100)}%</div>
               </div>
-            </div>
+              {rep?.timing && (
+                <div className="bg-surface px-4 py-2.5">
+                  <div className="text-[11px] text-muted">Analysis speed</div>
+                  <div className="num text-2xl font-semibold"><Count to={rep.timing.seconds ?? 0} decimals={1} /><span className="text-sm text-muted">s</span></div>
+                  <div className="num text-[11px] text-accent">{rep.timing.realtime_factor?.toFixed(1)}× realtime</div>
+                </div>
+              )}
+            </Reveal>
           )}
           <Player ref={player} src={`${ENGINE_URL}/clips/${id}/video`} aspect={d.clip.width / d.clip.height} fps={d.clip.fps} track={track}
-            segments={segs} status={rep?.status ?? {}} focus={focused} onTime={onTime} />
+            segments={segs} status={rep?.status ?? {}} focus={focused} onTime={onTime}
+            issues={issues} duration={d.clip.duration} view={view} onView={setView} />
           {rep && (
             <div className="-mb-1 flex justify-end">
               <button disabled={busy} onClick={() => edit({ action: "add", values: { start: Number(time.toFixed(2)), end: Number(Math.min(d.clip.duration, time + 2).toFixed(2)), narration: "new action" } })}
@@ -289,7 +338,7 @@ export default function ReviewPage() {
         </main>
 
         {/* ----------------------------------------------------------- right: nudges */}
-        <aside className="flex min-h-0 flex-col gap-3 lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-5.5rem)]" aria-label="Nudges">
+        <aside className={`flex min-h-0 flex-col gap-3 ${view === "theater" ? "" : "lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-5.5rem)]"}`} aria-label="Nudges">
           <div className="rounded-xl border border-line bg-surface p-3">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold">Nudges for the tester</h2>
@@ -320,17 +369,48 @@ export default function ReviewPage() {
               </p>
             )}
             {shown.map((i) => (
-              <IssueCard key={i.id} issue={i} segment={i.segment ? segById[i.segment] : undefined} focused={focus === i.id} decided={decidedIssue[i.id]}
+              <div key={i.id} id={`issue-${i.id}`}><IssueCard key={i.id} issue={i} segment={i.segment ? segById[i.segment] : undefined} focused={focus === i.id} decided={decidedIssue[i.id]}
                 clipId={id} busy={busy} claudeLeft={claudeLeft} onFocus={() => goto(i)} onDecide={(a) => decide(i, a)}
-                onClaude={i.group === "label" && i.segment ? () => askClaude(i.segment!) : undefined} />
+                onClaude={i.group === "label" && i.segment ? () => askClaude(i.segment!) : undefined} /></div>
             ))}
           </div>
           {rep && (
-            <div className="flex gap-2">
-              <a href={`/engine/clips/${id}/export`} className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent-fill px-3 py-2 text-sm font-semibold text-white hover:brightness-110">
-                <Download className="h-4 w-4" /> Export for the client
-              </a>
-              <button onClick={analyze} disabled={running} title="Run the gate again" className="ctl h-9 w-9"><RefreshCw className={`h-4 w-4 ${running ? "animate-spin" : ""}`} /></button>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <a href={`/engine/clips/${id}/export`} className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-surface-2 px-3 py-2 text-sm font-semibold hover:bg-surface-2/80">
+                  <Download className="h-4 w-4" /> Export JSON
+                </a>
+                <button onClick={analyze} disabled={running} title="Re-analyze" className="ctl h-9 w-9"><RefreshCw className={`h-4 w-4 ${running ? "animate-spin" : ""}`} /></button>
+              </div>
+              {d?.workflow && d.workflow.status !== "draft" && (
+                <p className="text-center text-xs text-muted">
+                  Status: <b className="text-ink">{d.workflow.status}</b>{d.workflow.version ? ` · version ${d.workflow.version}` : ""}{d.workflow.annotator ? ` · by ${d.workflow.annotator}` : ""}
+                </p>
+              )}
+              {role === "annotator" && d?.workflow?.status !== "submitted" && d?.workflow?.status !== "approved" && (
+                <button onClick={submitToQA} disabled={busy || running}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent-fill px-3 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50">
+                  <Send className="h-4 w-4" /> {d?.workflow?.status === "returned" ? "Resubmit to QA" : "Submit to QA"}
+                </button>
+              )}
+              {role === "qa" && (
+                <button onClick={autofix} disabled={busy || running}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-surface-2 px-3 py-2 text-sm font-semibold hover:bg-surface-2/80 disabled:opacity-50">
+                  <Wand2 className="h-4 w-4 text-accent" /> Auto-fix all one-click issues
+                </button>
+              )}
+              {role === "qa" && (
+                <div className="flex gap-2">
+                  <button onClick={() => wf("approve")}
+                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-clear px-3 py-2 text-sm font-semibold text-white hover:brightness-110">
+                    <CheckCircle2 className="h-4 w-4" /> Approve
+                  </button>
+                  <button onClick={() => { const note = prompt("Note for annotator:", `Please fix the ${open.length} open issue(s) and resubmit.`); if (note !== null) wf("return", { note }); }}
+                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-warning px-3 py-2 text-sm font-semibold text-warning hover:bg-warning/10">
+                    <RotateCcw className="h-4 w-4" /> Return
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </aside>

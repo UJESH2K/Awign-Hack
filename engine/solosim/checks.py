@@ -64,7 +64,8 @@ def _hand_box(sig, i):
     return [float(b[:, 0].min()), float(b[:, 1].min()), float(b[:, 2].max()), float(b[:, 3].max())]
 
 
-def run(clip: Clip, sig: dict, segments: list[Segment] | None = None) -> list[Issue]:
+def run(clip: Clip, sig: dict, segments: list[Segment] | None = None, check_ids: set | None = None) -> list[Issue]:
+    """All segments count as coverage; only those in `check_ids` (default all) get per-segment checks."""
     segs = sorted(segments if segments is not None else clip.segments, key=lambda s: s.start)
     t = sig["t"]
     act, on, off = _activity(sig)
@@ -75,6 +76,8 @@ def run(clip: Clip, sig: dict, segments: list[Segment] | None = None) -> list[Is
         issues.append(Issue(id=f"i{len(issues)}", **k))
 
     for n, g in enumerate(segs):
+        if check_ids is not None and g.id not in check_ids:
+            continue
         w = _window(t, g.start, g.end)
         idx = np.flatnonzero(w)
         # ---------------- timing
@@ -176,12 +179,24 @@ def segment_status(segments, issues) -> dict:
     return out
 
 
+def stable_ids(issues: list[Issue]) -> None:
+    """Ids that survive a re-check, so a reviewer's decision stays on the issue it was made on."""
+    import hashlib
+
+    seen: dict[str, int] = {}
+    for i in issues:
+        base = "i" + hashlib.md5(f"{i.kind}|{i.segment}|{i.t:.1f}|{i.title}".encode()).hexdigest()[:8]
+        seen[base] = seen.get(base, 0) + 1
+        i.id = base if seen[base] == 1 else f"{base}-{seen[base]}"
+
+
 def report(clip: Clip, sig: dict, issues: list[Issue], label: dict | None = None) -> dict:
+    stable_ids(issues)
     status = segment_status(clip.segments, issues)
     n = max(1, len(clip.segments))
     passed = sum(v == "pass" for v in status.values())
-    hands = float((~np.isnan(sig["hands"][:, 0, 0])).mean())
-    sharp = float((sig["blur"] >= BLUR_MIN).mean())
+    hands = float((~np.isnan(sig["hands"][:, 0, 0])).mean()) if len(sig["hands"]) else 1.0
+    sharp = float((sig["blur"] >= BLUR_MIN).mean()) if len(sig["blur"]) else 1.0
     groups = {}
     for i in issues:
         groups[i.group] = groups.get(i.group, 0) + 1

@@ -74,7 +74,7 @@ export type Report = {
   issues: Issue[];
   summary: Summary;
   label: { backend?: string; results?: Record<string, LabelOpinion> };
-  timing?: { seconds: number; measure_seconds: number };
+  timing?: { seconds: number; realtime_factor?: number; measure_seconds?: number };
   generated?: string;
 };
 
@@ -91,9 +91,27 @@ export type ClipDetail = {
   review: { decisions: Decision[]; original: Segment[] | null };
   job: Job | null;
   spend: Spend;
+  workflow?: Workflow;
 };
 
-export type ClipRow = ClipInfo & { summary: Summary | null; generated: string | null; decisions: number; job: Job | null };
+export type Snapshot = { issues: number; fix: number; readiness: number | null; by_kind: Record<string, number> };
+export type Workflow = {
+  status: "draft" | "submitted" | "returned" | "approved";
+  annotator: string | null;
+  submitted_at: string | null;
+  returned_at: string | null;
+  approved_at: string | null;
+  version?: number;
+  initial?: Snapshot;
+  at_submit?: Snapshot;
+  history: { action: string; at: string; by: string; note: string; version?: number; issues?: number }[];
+};
+
+export type Mistake = { clip: string; title: string; issue: string; segment: string | null; label: string | null; kind: string; group: string; severity: "fix" | "check" | "info"; t: number; title_text: string; fixable: boolean };
+export type AnnotatorReport = { annotator: string; clips: number; segments: number; footage_s: number; issues: number; fixed_before_submit: number; per_minute: number; by_kind: Record<string, number>; mistakes: Mistake[] };
+export type QAReport = { annotators: AnnotatorReport[]; by_kind: Record<string, number> };
+
+export type ClipRow = ClipInfo & { summary: Summary | null; generated: string | null; timing?: { seconds: number; realtime_factor?: number }; decisions: number; job: Job | null; workflow?: Workflow };
 
 export type Track = {
   t: number[];
@@ -140,15 +158,23 @@ export const KIND_LABEL: Record<string, string> = {
   "label mismatch": "Wrong label",
   "label doubtful": "Label doubtful",
   "action not visible": "Action not visible",
+  "inverted times": "Times swapped",
+  "out of range": "Out of range",
+  "empty label": "No label",
+  "duplicate id": "Duplicate ID",
+  "too long": "Too long",
+  "fields disagree": "Fields disagree",
+  typo: "Typo",
+  duplicate: "Duplicate segment",
 };
 
-export const GROUP_LABEL: Record<string, string> = { timing: "Timing", capture: "Capture", label: "Label", privacy: "Privacy" };
+export const GROUP_LABEL: Record<string, string> = { timing: "Timing", capture: "Capture", label: "Label", privacy: "Privacy", annotation: "Annotation" };
 
 // Status colours from the validated palette: pass = clear, check = caution, fix = warning.
 export const STATUS = {
-  pass: { label: "Pass", color: "#0ca30c" },
-  check: { label: "Check", color: "#fab219" },
-  fix: { label: "Fix", color: "#f06a1d" },
+  pass: { label: "Pass", color: "#0a8f3c" },
+  check: { label: "Check", color: "#c98a00" },
+  fix: { label: "Fix", color: "#d9600f" },
 } as const;
 
 export function fmt(t: number): string {

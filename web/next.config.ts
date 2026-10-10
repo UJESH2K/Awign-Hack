@@ -4,6 +4,8 @@ const ENGINE = process.env.ENGINE_URL ?? "http://127.0.0.1:8765";
 
 const nextConfig: NextConfig = {
   devIndicators: false, // keep the dev badge out of demo screenshots
+  // Uploads are whole videos; the proxy's 10MB default truncates them.
+  experimental: { proxyClientMaxBodySize: "512mb" },
   // The Python engine owns the loop and the Reactor key; the browser only talks to it via /engine.
   async rewrites() {
     return [{ source: "/engine/:path*", destination: `${ENGINE}/:path*` }];

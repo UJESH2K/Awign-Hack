@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Box, Camera, Clock, Crosshair, EyeOff, FileCheck2, Hand, Layers, ScanSearch, ShieldCheck, Tags } from "lucide-react";
 import { Logo } from "@/components/Brand";
+import { Count, Item, Reveal, Stagger, Tilt } from "@/components/Motion";
 import { ENGINE_URL } from "@/lib/solosim";
 
 export const dynamic = "force-dynamic";
@@ -43,7 +44,7 @@ export default async function Landing() {
   return (
     <div className="min-h-screen overflow-x-clip">
       <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur">
-        <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6" aria-label="Main">
+        <nav className="mx-auto flex h-16 max-w-6xl 2xl:max-w-7xl items-center justify-between gap-6 px-4 sm:px-6" aria-label="Main">
           <Logo className="text-lg" />
           <div className="hidden items-center gap-6 text-sm text-ink-2 md:flex">
             <a href="#problem" className="hover:text-ink">The problem</a>
@@ -51,62 +52,66 @@ export default async function Landing() {
             <a href="#evidence" className="hover:text-ink">Evidence</a>
             <a href="#industry" className="hover:text-ink">Why it matters</a>
           </div>
-          <Link href="/queue" className="inline-flex items-center gap-2 rounded-lg bg-ink px-4 py-2 text-sm font-medium text-bg hover:opacity-90">
-            Open the queue <ArrowRight className="h-4 w-4" />
+          <Link href="/annotator" className="inline-flex items-center gap-2 rounded-lg bg-ink px-4 py-2 text-sm font-medium text-bg hover:opacity-90">
+            Get started <ArrowRight className="h-4 w-4" />
           </Link>
         </nav>
       </header>
 
       <main>
-        <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 lg:pt-20">
-          <p className="eyebrow">Physical AI · data quality</p>
-          <h1 className="mt-4 max-w-4xl text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.6rem]">
-            Robot training data, checked before QA ever opens it.
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-2">
+        <section className="mx-auto max-w-6xl 2xl:max-w-7xl px-4 pb-16 pt-14 sm:px-6 lg:pt-20">
+          <Reveal><p className="eyebrow">Physical AI · data quality</p></Reveal>
+          <Reveal delay={0.05}>
+            <h1 className="mt-4 max-w-4xl text-4xl font-semibold leading-[1.06] tracking-tight sm:text-5xl lg:text-[3.6rem] 2xl:text-[4.2rem]">
+              Robot training data, checked before QA ever opens it.
+            </h1>
+          </Reveal>
+          <Reveal delay={0.1}><p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-2">
             SoloSim watches every annotated segment of first-person footage, finds the exact moment a label is wrong, and hands
             the tester the fix. Then it renders the annotation in a world model to see whether a robot could learn from it.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/queue" className="inline-flex items-center gap-2 rounded-lg bg-accent-fill px-5 py-3 font-medium text-accent-ink hover:opacity-90">
-              Review a clip <ArrowRight className="h-4 w-4" />
+          </p></Reveal>
+          <Reveal delay={0.15} className="mt-8 flex flex-wrap gap-3">
+            <Link href="/annotator" className="inline-flex items-center gap-2 rounded-lg bg-accent-fill px-5 py-3 font-medium text-accent-ink hover:opacity-90">
+              I&apos;m an annotator <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/bench" className="inline-flex items-center gap-2 rounded-lg border border-line-strong px-5 py-3 font-medium hover:bg-surface-2">
-              See the evidence
+            <Link href="/qa" className="inline-flex items-center gap-2 rounded-lg border border-line-strong px-5 py-3 font-medium hover:bg-surface-2">
+              I&apos;m a QA analyst <ArrowRight className="h-4 w-4" />
             </Link>
-          </div>
+          </Reveal>
 
-          <figure className="mt-12 overflow-hidden rounded-2xl border border-line bg-[#0b0c0e] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.45)]">
+          <Tilt className="mt-12" max={3}>
+          <figure className="overflow-hidden rounded-2xl border border-line bg-[#0b0c0e] shadow-[var(--shadow-3)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/shots/review.jpg" alt="The reviewer workspace: first-person footage with the detected hands boxed, the segment timeline coloured by status, and a nudge to move the end of 'put cereal bar into box' to 0:10.4 with a one-click fix."
+            <img src="/shots/review.jpg" alt="The reviewer workspace: first-person footage with the detected hands boxed, a strip reading 75 out of 100 robot-readiness and 32.0 s of analysis at 4.3x realtime, the segment timeline coloured by status, and a list of nudges, each starting at the exact second it went wrong."
               className="w-full" width={1920} height={1200} />
           </figure>
+          </Tilt>
           <p className="mt-3 text-center text-sm text-muted">
             The tester&apos;s view: the footage starts at the wrong moment, the hands are boxed, and the fix is one click.
           </p>
           {t && (
-            <dl className="mt-12 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-3">
+            <Reveal><dl className="mt-12 grid gap-px overflow-hidden rounded-[14px] border border-line bg-line shadow-[var(--shadow-1)] sm:grid-cols-3">
               <div className="bg-surface p-5">
                 <dt className="text-sm text-ink-2">planted annotation errors caught from the pixels alone</dt>
-                <dd className="num mt-1 text-4xl font-semibold tracking-tight">{Math.round(t.summary.recall * 100)}%</dd>
+                <dd className="mt-1 text-4xl font-semibold tracking-tight"><Count to={Math.round(t.summary.recall * 100)} suffix="%" /></dd>
                 <dd className="num text-xs text-muted">{t.summary.planted} errors, real EPIC-KITCHENS footage</dd>
               </div>
               <div className="bg-surface p-5">
                 <dt className="text-sm text-ink-2">false flags on untouched segments</dt>
-                <dd className="num mt-1 text-4xl font-semibold tracking-tight">{(t.summary.false_flag_rate * 100).toFixed(1)}%</dd>
+                <dd className="mt-1 text-4xl font-semibold tracking-tight"><Count to={t.summary.false_flag_rate * 100} decimals={1} suffix="%" /></dd>
                 <dd className="text-xs text-muted">testers are not buried in noise</dd>
               </div>
               <div className="bg-surface p-5">
                 <dt className="text-sm text-ink-2">{lab ? "copied labels flagged with confidence by the AI reviewer" : "mistyped end times caught"}</dt>
-                <dd className="num mt-1 text-4xl font-semibold tracking-tight">{Math.round((lab ? (lab.tiers?.fix.recall ?? lab.recall) : t.summary.by_kind.truncated?.recall ?? 0) * 100)}%</dd>
+                <dd className="mt-1 text-4xl font-semibold tracking-tight"><Count to={Math.round((lab ? (lab.tiers?.fix.recall ?? lab.recall) : t.summary.by_kind.truncated?.recall ?? 0) * 100)} suffix="%" /></dd>
                 <dd className="text-xs text-muted">{lab ? `while flagging ${Math.round((lab.tiers?.fix.false_flag_rate ?? lab.false_flag_rate) * 100)}% of real labels · Claude Haiku 5.5, ~$0.0002 per check` : "every one"}</dd>
               </div>
-            </dl>
+            </dl></Reveal>
           )}
         </section>
 
         <section id="problem" className="scroll-mt-20 border-y border-line bg-surface">
-          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_1.1fr]">
+          <div className="mx-auto grid max-w-6xl 2xl:max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_1.1fr]">
             <div>
               <p className="eyebrow">The problem</p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">The bottleneck in robot data is not capture. It is checking.</h2>
@@ -129,40 +134,40 @@ export default async function Landing() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <section className="mx-auto max-w-6xl 2xl:max-w-7xl px-4 py-20 sm:px-6">
           <p className="eyebrow">Where it sits</p>
           <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl">A gate between the annotator and QA. Nothing else changes.</h2>
-          <ol className="mt-10 grid gap-3 md:grid-cols-5">
+          <Stagger className="mt-10 grid gap-3 md:grid-cols-5">
             {PIPELINE.map((p, i) => (
-              <li key={p.title} className={`relative rounded-xl border p-5 ${p.hi ? "border-accent bg-accent-soft" : "border-line bg-surface"}`}>
+              <Item key={p.title} className={`card card-lift relative p-5 ${p.hi ? "border-accent bg-accent-soft" : ""}`}>
                 <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
                 <p.icon className={`mt-2 h-6 w-6 ${p.hi ? "text-accent" : "text-ink-2"}`} aria-hidden />
                 <h3 className="mt-2 font-semibold">{p.title}</h3>
                 <p className="mt-1 text-sm text-ink-2">{p.body}</p>
-              </li>
+              </Item>
             ))}
-          </ol>
+          </Stagger>
         </section>
 
         <section id="checks" className="scroll-mt-20 border-y border-line bg-surface">
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-6xl 2xl:max-w-7xl px-4 py-20 sm:px-6">
             <p className="eyebrow">What it checks, per segment</p>
             <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl">Every flag says where, what, and how to fix it.</h2>
-            <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Stagger className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {CHECKS.map((c) => (
-                <li key={c.title} className="rounded-xl border border-line bg-bg p-5">
+                <Item key={c.title} className="card card-lift p-5">
                   <c.icon className="h-6 w-6 text-accent" aria-hidden />
                   <h3 className="mt-3 font-semibold">{c.title}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-ink-2">{c.body}</p>
-                </li>
+                </Item>
               ))}
-            </ul>
+            </Stagger>
           </div>
         </section>
 
 
         {/* World-model test */}
-        <section id="world" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
+        <section id="world" className="mx-auto max-w-6xl 2xl:max-w-7xl scroll-mt-20 px-4 py-20 sm:px-6">
           <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.15fr]">
             <div>
               <p className="eyebrow">Will it work as a robot scenario?</p>
@@ -185,7 +190,7 @@ export default async function Landing() {
             </figure>
           </div>
         </section>
-        <section id="evidence" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
+        <section id="evidence" className="mx-auto max-w-6xl 2xl:max-w-7xl scroll-mt-20 px-4 py-20 sm:px-6">
           <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
             <div>
               <p className="eyebrow">Evidence</p>
@@ -218,7 +223,7 @@ export default async function Landing() {
         </section>
 
         <section id="industry" className="scroll-mt-20 border-y border-line bg-surface">
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-6xl 2xl:max-w-7xl px-4 py-20 sm:px-6">
             <p className="eyebrow">Why it matters</p>
             <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl">Cheaper checking, better robots, faster feedback.</h2>
             <div className="mt-10 grid gap-4 md:grid-cols-3">
@@ -237,7 +242,7 @@ export default async function Landing() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <section className="mx-auto max-w-6xl 2xl:max-w-7xl px-4 py-20 sm:px-6">
           <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
             <div>
               <p className="eyebrow">Honest limits</p>
@@ -259,20 +264,20 @@ export default async function Landing() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+        <section className="mx-auto max-w-6xl 2xl:max-w-7xl px-4 pb-24 sm:px-6">
           <div className="flex flex-col items-start justify-between gap-6 rounded-2xl bg-[#0b0c0e] p-8 text-white sm:flex-row sm:items-center sm:p-10">
             <div>
               <h2 className="text-3xl font-semibold tracking-tight">Open a clip and fix it.</h2>
-              <p className="mt-2 text-white/70">Four real first-person videos are waiting in the queue. Upload your own with its annotations.</p>
+              <p className="mt-2 text-white/70">Upload a video with its annotations and watch the issues appear in real time.</p>
             </div>
-            <Link href="/queue" className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 font-medium text-[#0b0c0e] hover:opacity-90">
-              Open the review queue <ArrowRight className="h-4 w-4" />
+            <Link href="/annotator" className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 font-medium text-[#0b0c0e] hover:opacity-90">
+              Start as annotator <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </section>
       </main>
       <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-sm text-muted sm:flex-row sm:justify-between sm:px-6">
+        <div className="mx-auto flex max-w-6xl 2xl:max-w-7xl flex-col gap-2 px-4 py-8 text-sm text-muted sm:flex-row sm:justify-between sm:px-6">
           <span>SoloSim · Awign Physical AI Hackathon, Bengaluru, October 2026</span>
           <span>Footage: EPIC-KITCHENS-100 (CC BY-NC 4.0). World model: Reactor LingBot World 2.</span>
         </div>
